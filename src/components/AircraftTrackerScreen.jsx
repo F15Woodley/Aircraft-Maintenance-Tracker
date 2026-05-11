@@ -628,134 +628,60 @@ export default function AircraftTrackerScreen() {
                   engine events, or propeller events.
                 </p>
 
-               <div className="maintenance-grid">
-                  <input className="input" placeholder="Item Name, e.g. Oil Change" value={maintenanceForm.item_name} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, item_name: e.target.value })} />
+           <div className="maintenance-grid">
+  <input className="input" placeholder="Item Name, e.g. Oil Change" value={maintenanceForm.item_name} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, item_name: e.target.value })} />
 
-                  <select className="input" value={maintenanceForm.category} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, category: e.target.value })}>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="inspection">Inspection</option>
-                    <option value="certification">Certification</option>
-                    <option value="engine">Engine</option>
-                    <option value="propeller">Propeller</option>
-                    <option value="avionics">Avionics</option>
-                    <option value="other">Other</option>
-                  </select>
+  <select className="input" value={maintenanceForm.category} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, category: e.target.value })}>
+    <option value="maintenance">Maintenance</option>
+    <option value="inspection">Inspection</option>
+    <option value="certification">Certification</option>
+    <option value="engine">Engine</option>
+    <option value="propeller">Propeller</option>
+    <option value="avionics">Avionics</option>
+    <option value="other">Other</option>
+  </select>
 
-                  <select className="input" value={maintenanceForm.interval_type} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_type: e.target.value })}>
-                    <option value="hours">Hours</option>
-                    <option value="months">Months / Date</option>
-                    <option value="both">Hours and Date</option>
-                  </select>
-
-<div className="maintenance-grid">
+  <select className="input" value={maintenanceForm.interval_type} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_type: e.target.value })}>
+    <option value="hours">Hours</option>
+    <option value="months">Months / Date</option>
+    <option value="both">Hours and Date</option>
+  </select>
 
   <div>
     <div className="field-label">Last Completed Date</div>
-    <input
-      className="input"
-      type="date"
-      value={maintenanceForm.last_completed_date}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          last_completed_date: e.target.value,
-        })
-      }
-    />
+    <input className="input" type="date" value={maintenanceForm.last_completed_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_date: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Last Completed Tach</div>
-    <input
-      className="input"
-      placeholder="e.g. 3673"
-      value={maintenanceForm.last_completed_tach}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          last_completed_tach: e.target.value,
-        })
-      }
-    />
+    <input className="input" placeholder="e.g. 3673" value={maintenanceForm.last_completed_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_tach: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Interval Hours</div>
-    <input
-      className="input"
-      placeholder="e.g. 50"
-      value={maintenanceForm.interval_hours}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          interval_hours: e.target.value,
-        })
-      }
-    />
+    <input className="input" placeholder="e.g. 50" value={maintenanceForm.interval_hours} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_hours: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Interval Months</div>
-    <input
-      className="input"
-      placeholder="e.g. 12"
-      value={maintenanceForm.interval_months}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          interval_months: e.target.value,
-        })
-      }
-    />
+    <input className="input" placeholder="e.g. 12" value={maintenanceForm.interval_months} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_months: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Due Tach</div>
-    <input
-      className="input"
-      placeholder="Auto or manual"
-      value={maintenanceForm.due_tach}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          due_tach: e.target.value,
-        })
-      }
-    />
+    <input className="input" placeholder="Auto or manual" value={maintenanceForm.due_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_tach: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Due Date</div>
-    <input
-      className="input"
-      type="date"
-      value={maintenanceForm.due_date}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          due_date: e.target.value,
-        })
-      }
-    />
+    <input className="input" type="date" value={maintenanceForm.due_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_date: e.target.value })} />
   </div>
 
   <div>
     <div className="field-label">Yellow Warning Threshold (%)</div>
-    <input
-      className="input"
-      placeholder="e.g. 5"
-      value={maintenanceForm.warning_percent}
-      onChange={(e) =>
-        setMaintenanceForm({
-          ...maintenanceForm,
-          warning_percent: e.target.value,
-        })
-      }
-    />
+    <input className="input" placeholder="e.g. 5" value={maintenanceForm.warning_percent} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, warning_percent: e.target.value })} />
   </div>
-
 </div>
-
                 <textarea
                   className="input textarea"
                   placeholder="Maintenance notes..."
