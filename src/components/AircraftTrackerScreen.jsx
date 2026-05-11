@@ -445,24 +445,26 @@ export default function AircraftTrackerScreen() {
                   }
                 />
 
-                <label className="checkbox-row">
-                  <input
-                    type="checkbox"
-                    checked={discrepancyForm.is_grounding}
-                    onChange={(e) =>
-                      setDiscrepancyForm({
-                        ...discrepancyForm,
-                        is_grounding: e.target.checked,
-                        severity: e.target.checked ? "red" : discrepancyForm.severity,
-                      })
-                    }
-                  />
-                  Grounding item / aircraft should not fly
-                </label>
+<div className="discrepancy-actions">
+  <label className="checkbox-row">
+    <input
+      type="checkbox"
+      checked={discrepancyForm.is_grounding}
+      onChange={(e) =>
+        setDiscrepancyForm({
+          ...discrepancyForm,
+          is_grounding: e.target.checked,
+          severity: e.target.checked ? "red" : discrepancyForm.severity,
+        })
+      }
+    />
+    Grounding item / aircraft should not fly
+  </label>
 
-                <button className="primary-button" onClick={addDiscrepancy}>
-                  Save Discrepancy
-                </button>
+  <button className="primary-button" onClick={addDiscrepancy}>
+    Save Discrepancy
+  </button>
+</div>
               </section>
             </>
           )}
