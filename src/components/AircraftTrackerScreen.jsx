@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
+import "../App.css";
 
 export default function AircraftTrackerScreen() {
   const [aircraft, setAircraft] = useState([]);
@@ -23,7 +24,7 @@ export default function AircraftTrackerScreen() {
       .order("tail_number");
 
     if (error) {
-      console.error(error);
+      alert(error.message);
     } else {
       setAircraft(data || []);
     }
@@ -39,17 +40,15 @@ export default function AircraftTrackerScreen() {
     e.preventDefault();
 
     const payload = {
-      tail_number: form.tail_number.toUpperCase(),
-      make: form.make,
-      model: form.model,
+      tail_number: form.tail_number.trim().toUpperCase(),
+      make: form.make.trim(),
+      model: form.model.trim(),
       current_tach: Number(form.current_tach || 0),
       total_time: Number(form.total_time || 0),
-      flightaware_url: form.flightaware_url,
+      flightaware_url: form.flightaware_url.trim(),
     };
 
-    const { error } = await supabase
-      .from("aircraft")
-      .insert(payload);
+    const { error } = await supabase.from("aircraft").insert(payload);
 
     if (error) {
       alert(error.message);
@@ -69,16 +68,9 @@ export default function AircraftTrackerScreen() {
   }
 
   async function handleDelete(id) {
-    const confirmed = window.confirm(
-      "Delete this aircraft?"
-    );
+    if (!window.confirm("Delete this aircraft?")) return;
 
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("aircraft")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("aircraft").delete().eq("id", id);
 
     if (error) {
       alert(error.message);
@@ -89,161 +81,201 @@ export default function AircraftTrackerScreen() {
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
-      <h1>Aircraft Maintenance Tracker</h1>
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand">
+            <div className="brand-mark" />
 
-      <form
-        onSubmit={handleAddAircraft}
-        style={{
-          display: "grid",
-          gap: 12,
-          marginTop: 24,
-          marginBottom: 32,
-        }}
-      >
-        <input
-          placeholder="Tail Number"
-          value={form.tail_number}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              tail_number: e.target.value,
-            })
-          }
-        />
-
-        <input
-          placeholder="Make"
-          value={form.make}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              make: e.target.value,
-            })
-          }
-        />
-
-        <input
-          placeholder="Model"
-          value={form.model}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              model: e.target.value,
-            })
-          }
-        />
-
-        <input
-          placeholder="Current Tach"
-          type="number"
-          step="0.1"
-          value={form.current_tach}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              current_tach: e.target.value,
-            })
-          }
-        />
-
-        <input
-          placeholder="Total Time"
-          type="number"
-          step="0.1"
-          value={form.total_time}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              total_time: e.target.value,
-            })
-          }
-        />
-
-        <input
-          placeholder="FlightAware URL"
-          value={form.flightaware_url}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              flightaware_url: e.target.value,
-            })
-          }
-        />
-
-        <button type="submit">
-          Add Aircraft
-        </button>
-      </form>
-
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gap: 16,
-          }}
-        >
-          {aircraft.map((plane) => (
-            <div
-              key={plane.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                padding: 16,
-              }}
-            >
-              <h2>
-                {plane.tail_number}
-              </h2>
-
-              <div>
-                {plane.make} {plane.model}
+            <div>
+              <div className="brand-title">
+                Sky <span>Sensei</span>
               </div>
-
-              <div
-                style={{
-                  marginTop: 12,
-                }}
-              >
-                Current Tach:{" "}
-                {plane.current_tach}
+              <div className="brand-subtitle">
+                Aircraft Intelligence Platform
               </div>
-
-              <div>
-                Total Time:{" "}
-                {plane.total_time}
-              </div>
-
-              {plane.flightaware_url && (
-                <div style={{ marginTop: 12 }}>
-                  <a
-                    href={
-                      plane.flightaware_url
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open FlightAware
-                  </a>
-                </div>
-              )}
-
-              <button
-                onClick={() =>
-                  handleDelete(plane.id)
-                }
-                style={{
-                  marginTop: 16,
-                }}
-              >
-                Delete
-              </button>
             </div>
-          ))}
+          </div>
+
+          <div className="topbar-actions">
+            <div className="pill">Fleet Ops</div>
+            <div className="pill">Maintenance</div>
+          </div>
         </div>
-      )}
+      </header>
+
+      <main className="page">
+        <section className="hero">
+          <div className="hero-card">
+            <div className="hero-eyebrow">AI Mentor for Safer Flying</div>
+            <h1>Aircraft Maintenance Tracker</h1>
+            <p>
+              Track aircraft status, tach time, total time, inspections,
+              oil changes, and FlightAware links from a centralized fleet
+              dashboard.
+            </p>
+          </div>
+
+          <div className="card status-panel">
+            <div className="status-number">{aircraft.length}</div>
+            <div className="status-label">Aircraft in Fleet</div>
+
+            <div style={{ marginTop: 22 }}>
+              <div className="status-number status-good">
+                {aircraft.length}
+              </div>
+              <div className="status-label">Currently Active</div>
+            </div>
+          </div>
+        </section>
+
+        <section className="card form-card">
+          <div className="section-heading">
+            <div>
+              <h2>Add Aircraft</h2>
+              <p>Create a new aircraft record for this company.</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleAddAircraft} className="form-grid">
+            <input
+              className="input"
+              placeholder="Tail Number"
+              value={form.tail_number}
+              onChange={(e) =>
+                setForm({ ...form, tail_number: e.target.value })
+              }
+              required
+            />
+
+            <input
+              className="input"
+              placeholder="Make"
+              value={form.make}
+              onChange={(e) => setForm({ ...form, make: e.target.value })}
+            />
+
+            <input
+              className="input"
+              placeholder="Model"
+              value={form.model}
+              onChange={(e) => setForm({ ...form, model: e.target.value })}
+            />
+
+            <input
+              className="input"
+              placeholder="Current Tach"
+              type="number"
+              step="0.1"
+              value={form.current_tach}
+              onChange={(e) =>
+                setForm({ ...form, current_tach: e.target.value })
+              }
+            />
+
+            <input
+              className="input"
+              placeholder="Total Time"
+              type="number"
+              step="0.1"
+              value={form.total_time}
+              onChange={(e) =>
+                setForm({ ...form, total_time: e.target.value })
+              }
+            />
+
+            <input
+              className="input"
+              placeholder="FlightAware URL"
+              value={form.flightaware_url}
+              onChange={(e) =>
+                setForm({ ...form, flightaware_url: e.target.value })
+              }
+            />
+
+            <button className="primary-button" type="submit">
+              Add Aircraft
+            </button>
+          </form>
+        </section>
+
+        <section style={{ marginTop: 26 }}>
+          <div className="section-heading">
+            <div>
+              <h2>Fleet</h2>
+              <p>Aircraft currently registered in this company workspace.</p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="card empty-state">Loading aircraft...</div>
+          ) : aircraft.length === 0 ? (
+            <div className="card empty-state">No aircraft added yet.</div>
+          ) : (
+            <div className="grid fleet-grid">
+              {aircraft.map((plane) => (
+                <div key={plane.id} className="card aircraft-card">
+                  <div className="aircraft-content">
+                    <div className="aircraft-top">
+                      <div>
+                        <h3>{plane.tail_number}</h3>
+                        <div className="aircraft-type">
+                          {plane.make} {plane.model}
+                        </div>
+                      </div>
+
+                      <div className="status-pill">
+                        <span className="status-dot" />
+                        Active
+                      </div>
+                    </div>
+
+                    <div className="metric-row">
+                      <div className="metric">
+                        <div className="metric-label">Current Tach</div>
+                        <div className="metric-value">
+                          {Number(plane.current_tach || 0).toFixed(1)}
+                        </div>
+                      </div>
+
+                      <div className="metric">
+                        <div className="metric-label">Total Time</div>
+                        <div className="metric-value">
+                          {Number(plane.total_time || 0).toFixed(1)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card-actions">
+                      {plane.flightaware_url ? (
+                        <a
+                          href={plane.flightaware_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="link-button"
+                        >
+                          Open FlightAware
+                        </a>
+                      ) : (
+                        <span className="status-label">
+                          No FlightAware link
+                        </span>
+                      )}
+
+                      <button
+                        className="danger-button"
+                        onClick={() => handleDelete(plane.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
     </div>
   );
 }
