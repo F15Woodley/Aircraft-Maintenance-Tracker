@@ -628,7 +628,7 @@ export default function AircraftTrackerScreen() {
                   engine events, or propeller events.
                 </p>
 
-                <div className="form-grid">
+               <div className="maintenance-grid">
                   <input className="input" placeholder="Item Name, e.g. Oil Change" value={maintenanceForm.item_name} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, item_name: e.target.value })} />
 
                   <select className="input" value={maintenanceForm.category} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, category: e.target.value })}>
