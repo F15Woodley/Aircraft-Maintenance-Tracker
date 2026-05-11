@@ -448,3 +448,40 @@ body {
     height: 68px;
   }
 }
+
+.status-title.green {
+  color: #22c55e;
+}
+
+.status-title.yellow {
+  color: #f59e0b;
+}
+
+.status-title.red {
+  color: #ef4444;
+}
+
+.status-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.edit-button {
+  border-color: rgba(59, 130, 246, 0.55);
+  color: #bfdbfe;
+}
+
+.close-button {
+  border-color: rgba(239, 68, 68, 0.65);
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+@media (max-width: 700px) {
+  .status-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
