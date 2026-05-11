@@ -376,5 +376,57 @@ body {
   border-radius: 18px;
   background: rgba(2, 6, 23, 0.35);
 }
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding: 10px;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nav-button {
+    width: 100%;
+  }
+
+  .card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .metrics {
+    width: 100%;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .status-item {
+    grid-template-columns: 1fr;
+  }
+
+  .small-button {
+    width: 100%;
+  }
+
+  .status-title {
+    font-size: 32px;
+  }
+
+  .status-light {
+    width: 68px;
+    height: 68px;
+  }
 }
 
