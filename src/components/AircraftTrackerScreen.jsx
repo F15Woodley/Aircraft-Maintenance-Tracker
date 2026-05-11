@@ -78,13 +78,23 @@ useEffect(() => {
     loadAircraft(company.id);
   }
 
+  <div className="company-name">
+  {company?.name || "Aircraft Maintenance Tracker"}
+</div>
+
   return (
     <div className="app-shell">
       <div className="dashboard">
         <div className="topbar">
-          <button className="nav-button">Fleet Ops</button>
-          <button className="nav-button">Maintenance</button>
-        </div>
+  <div className="company-name">
+    {company?.name || "Aircraft Maintenance Tracker"}
+  </div>
+
+  <div className="topbar-actions">
+    <button className="nav-button">Fleet Ops</button>
+    <button className="nav-button">Maintenance</button>
+  </div>
+</div>
 
         <main className="content">
           <section className="hero-grid">
