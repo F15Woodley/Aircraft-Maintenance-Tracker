@@ -4,6 +4,7 @@ import "../App.css";
 
 export default function AircraftTrackerScreen() {
   const [aircraft, setAircraft] = useState([]);
+  const [company, setCompany] = useState(null);
 
   const [form, setForm] = useState({
     tail_number: "",
@@ -14,26 +15,44 @@ export default function AircraftTrackerScreen() {
     flightaware_url: "",
   });
 
-  async function loadAircraft() {
-    const { data, error } = await supabase
-      .from("aircraft")
-      .select("*")
-      .order("created_at", { ascending: false });
+async function loadCompany() {
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .limit(1)
+    .single();
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    setAircraft(data || []);
+  if (error) {
+    alert(error.message);
+    return;
   }
 
-  useEffect(() => {
-    loadAircraft();
-  }, []);
+  setCompany(data);
+  loadAircraft(data.id);
+}
+  
+async function loadAircraft(companyId) {
+  const { data, error } = await supabase
+    .from("aircraft")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setAircraft(data || []);
+}
+
+useEffect(() => {
+  loadCompany();
+}, []);
 
   async function addAircraft() {
     const { error } = await supabase.from("aircraft").insert({
+      company_id: company?.id,
       tail_number: form.tail_number.trim().toUpperCase(),
       make: form.make.trim(),
       model: form.model.trim(),
@@ -56,7 +75,7 @@ export default function AircraftTrackerScreen() {
       flightaware_url: "",
     });
 
-    loadAircraft();
+    loadAircraft(company.id);
   }
 
   return (
