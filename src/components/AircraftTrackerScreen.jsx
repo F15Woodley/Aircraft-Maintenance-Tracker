@@ -164,12 +164,34 @@ export default function AircraftTrackerScreen() {
     loadDiscrepancies(selectedAircraft.id);
   }
 
+  function showDiscrepancyDetails(item) {
+    alert(
+      `${item.title || "Untitled Discrepancy"}\n\n` +
+      `Category: ${item.category}\n` +
+      `Severity: ${item.severity}\n` +
+      `Grounding: ${item.is_grounding ? "Yes" : "No"}\n\n` +
+      `${item.description || "No description provided."}`
+    );
+  }
+
+  function editDiscrepancy(item) {
+    setDiscrepancyForm({
+      title: item.title || "",
+      description: item.description || "",
+      category: item.category || "other",
+      severity: item.severity || "yellow",
+      is_grounding: item.is_grounding || false,
+    });
+
+    alert("Discrepancy loaded into the form below. Edit it, then save as a new entry for now.");
+  }
+  
   const aircraftStatus = useMemo(() => {
     if (discrepancies.some((item) => item.is_grounding || item.severity === "red")) {
       return {
         color: "red",
         label: "Red",
-        message: "Aircraft has a grounding or red discrepancy.",
+        message: "Aircraft has a grounding discrepancy or is overdue for service/inspection.",
       };
     }
 
@@ -325,7 +347,9 @@ export default function AircraftTrackerScreen() {
 
                 <div className={`card status-card ${aircraftStatus.color}`}>
                   <div className={`status-light ${aircraftStatus.color}`} />
-                  <div className="status-title">{aircraftStatus.label}</div>
+                  <div className={`status-title ${aircraftStatus.color}`}>
+                      {aircraftStatus.label}
+                    </div>
                   <div className="status-message">{aircraftStatus.message}</div>
                 </div>
               </section>
