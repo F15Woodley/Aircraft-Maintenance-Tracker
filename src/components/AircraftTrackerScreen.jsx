@@ -647,20 +647,114 @@ export default function AircraftTrackerScreen() {
                     <option value="both">Hours and Date</option>
                   </select>
 
-                  <input className="input" type="date" placeholder="Last Completed Date" value={maintenanceForm.last_completed_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_date: e.target.value })} />
+<div className="maintenance-grid">
 
-                  <input className="input" placeholder="Last Completed Tach" value={maintenanceForm.last_completed_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_tach: e.target.value })} />
+  <div>
+    <div className="field-label">Last Completed Date</div>
+    <input
+      className="input"
+      type="date"
+      value={maintenanceForm.last_completed_date}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          last_completed_date: e.target.value,
+        })
+      }
+    />
+  </div>
 
-                  <input className="input" placeholder="Interval Hours" value={maintenanceForm.interval_hours} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_hours: e.target.value })} />
+  <div>
+    <div className="field-label">Last Completed Tach</div>
+    <input
+      className="input"
+      placeholder="e.g. 3673"
+      value={maintenanceForm.last_completed_tach}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          last_completed_tach: e.target.value,
+        })
+      }
+    />
+  </div>
 
-                  <input className="input" placeholder="Interval Months" value={maintenanceForm.interval_months} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_months: e.target.value })} />
+  <div>
+    <div className="field-label">Interval Hours</div>
+    <input
+      className="input"
+      placeholder="e.g. 50"
+      value={maintenanceForm.interval_hours}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          interval_hours: e.target.value,
+        })
+      }
+    />
+  </div>
 
-                  <input className="input" placeholder="Due Tach" value={maintenanceForm.due_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_tach: e.target.value })} />
+  <div>
+    <div className="field-label">Interval Months</div>
+    <input
+      className="input"
+      placeholder="e.g. 12"
+      value={maintenanceForm.interval_months}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          interval_months: e.target.value,
+        })
+      }
+    />
+  </div>
 
-                  <input className="input" type="date" placeholder="Due Date" value={maintenanceForm.due_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_date: e.target.value })} />
+  <div>
+    <div className="field-label">Due Tach</div>
+    <input
+      className="input"
+      placeholder="Auto or manual"
+      value={maintenanceForm.due_tach}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          due_tach: e.target.value,
+        })
+      }
+    />
+  </div>
 
-                  <input className="input" placeholder="Warning Percent" value={maintenanceForm.warning_percent} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, warning_percent: e.target.value })} />
-                </div>
+  <div>
+    <div className="field-label">Due Date</div>
+    <input
+      className="input"
+      type="date"
+      value={maintenanceForm.due_date}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          due_date: e.target.value,
+        })
+      }
+    />
+  </div>
+
+  <div>
+    <div className="field-label">Yellow Warning Threshold (%)</div>
+    <input
+      className="input"
+      placeholder="e.g. 5"
+      value={maintenanceForm.warning_percent}
+      onChange={(e) =>
+        setMaintenanceForm({
+          ...maintenanceForm,
+          warning_percent: e.target.value,
+        })
+      }
+    />
+  </div>
+
+</div>
 
                 <textarea
                   className="input textarea"
