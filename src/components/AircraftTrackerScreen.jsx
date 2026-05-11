@@ -7,6 +7,7 @@ export default function AircraftTrackerScreen() {
   const [company, setCompany] = useState(null);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
   const [discrepancies, setDiscrepancies] = useState([]);
+  const [maintenanceEvents, setMaintenanceEvents] = useState([]);
 
   const [form, setForm] = useState({
     tail_number: "",
@@ -23,6 +24,20 @@ export default function AircraftTrackerScreen() {
     category: "other",
     severity: "yellow",
     is_grounding: false,
+  });
+
+  const [maintenanceForm, setMaintenanceForm] = useState({
+    item_name: "",
+    category: "maintenance",
+    interval_type: "hours",
+    last_completed_date: "",
+    last_completed_tach: "",
+    interval_hours: "",
+    interval_months: "",
+    due_tach: "",
+    due_date: "",
+    warning_percent: "5",
+    notes: "",
   });
 
   async function loadCompany() {
@@ -72,6 +87,22 @@ export default function AircraftTrackerScreen() {
     setDiscrepancies(data || []);
   }
 
+  async function loadMaintenanceEvents(aircraftId) {
+    const { data, error } = await supabase
+      .from("aircraft_maintenance_events")
+      .select("*")
+      .eq("aircraft_id", aircraftId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setMaintenanceEvents(data || []);
+  }
+
   useEffect(() => {
     loadCompany();
   }, []);
@@ -112,6 +143,7 @@ export default function AircraftTrackerScreen() {
   function openAircraftDashboard(plane) {
     setSelectedAircraft(plane);
     loadDiscrepancies(plane.id);
+    loadMaintenanceEvents(plane.id);
   }
 
   async function addDiscrepancy() {
@@ -164,13 +196,191 @@ export default function AircraftTrackerScreen() {
     loadDiscrepancies(selectedAircraft.id);
   }
 
+  async function addMaintenanceEvent() {
+    if (!selectedAircraft || !company) return;
+
+    const { error } = await supabase.from("aircraft_maintenance_events").insert({
+      company_id: company.id,
+      aircraft_id: selectedAircraft.id,
+      item_name: maintenanceForm.item_name.trim(),
+      category: maintenanceForm.category,
+      interval_type: maintenanceForm.interval_type,
+      last_completed_date: maintenanceForm.last_completed_date || null,
+      last_completed_tach: maintenanceForm.last_completed_tach
+        ? Number(maintenanceForm.last_completed_tach)
+        : null,
+      interval_hours: maintenanceForm.interval_hours
+        ? Number(maintenanceForm.interval_hours)
+        : null,
+      interval_months: maintenanceForm.interval_months
+        ? Number(maintenanceForm.interval_months)
+        : null,
+      due_tach: maintenanceForm.due_tach
+        ? Number(maintenanceForm.due_tach)
+        : null,
+      due_date: maintenanceForm.due_date || null,
+      warning_percent: Number(maintenanceForm.warning_percent || 5),
+      notes: maintenanceForm.notes.trim(),
+      status: "active",
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setMaintenanceForm({
+      item_name: "",
+      category: "maintenance",
+      interval_type: "hours",
+      last_completed_date: "",
+      last_completed_tach: "",
+      interval_hours: "",
+      interval_months: "",
+      due_tach: "",
+      due_date: "",
+      warning_percent: "5",
+      notes: "",
+    });
+
+    loadMaintenanceEvents(selectedAircraft.id);
+  }
+
+  async function closeMaintenanceEvent(id) {
+    const { error } = await supabase
+      .from("aircraft_maintenance_events")
+      .update({ status: "completed" })
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    loadMaintenanceEvents(selectedAircraft.id);
+  }
+
+  function getMaintenanceStatus(item) {
+    const currentTach = Number(selectedAircraft?.current_tach || 0);
+
+    if (item.due_tach && currentTach >= Number(item.due_tach)) {
+      return {
+        color: "red",
+        label: "Overdue",
+        reason: `${item.item_name} overdue by ${(
+          currentTach - Number(item.due_tach)
+        ).toFixed(1)} hours`,
+      };
+    }
+
+    if (item.due_date) {
+      const today = new Date();
+      const dueDate = new Date(item.due_date);
+      today.setHours(0, 0, 0, 0);
+      dueDate.setHours(0, 0, 0, 0);
+
+      if (today > dueDate) {
+        return {
+          color: "red",
+          label: "Overdue",
+          reason: `${item.item_name} overdue by date`,
+        };
+      }
+
+      const daysRemaining = Math.ceil(
+        (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysRemaining <= 30) {
+        return {
+          color: "yellow",
+          label: "Upcoming",
+          reason: `${item.item_name} due in ${daysRemaining} days`,
+        };
+      }
+    }
+
+    if (item.due_tach && item.interval_hours) {
+      const hoursRemaining = Number(item.due_tach) - currentTach;
+      const warningHours =
+        Number(item.interval_hours) * (Number(item.warning_percent || 5) / 100);
+
+      if (hoursRemaining <= warningHours) {
+        return {
+          color: "yellow",
+          label: "Upcoming",
+          reason: `${item.item_name} due in ${hoursRemaining.toFixed(1)} hours`,
+        };
+      }
+    }
+
+    return {
+      color: "green",
+      label: "Good",
+      reason: `${item.item_name} is not due`,
+    };
+  }
+
+  const maintenanceDrivers = useMemo(() => {
+    return maintenanceEvents
+      .map((item) => ({
+        ...item,
+        computed: getMaintenanceStatus(item),
+      }))
+      .filter((item) => item.computed.color !== "green");
+  }, [maintenanceEvents, selectedAircraft]);
+
+  const aircraftStatus = useMemo(() => {
+    if (
+      discrepancies.some((item) => item.is_grounding || item.severity === "red")
+    ) {
+      return {
+        color: "red",
+        label: "Red",
+        message:
+          "Aircraft has a grounding discrepancy or is overdue for service/inspection.",
+      };
+    }
+
+    if (maintenanceDrivers.some((item) => item.computed.color === "red")) {
+      return {
+        color: "red",
+        label: "Red",
+        message:
+          "Aircraft has a grounding discrepancy or is overdue for service/inspection.",
+      };
+    }
+
+    if (discrepancies.some((item) => item.severity === "yellow")) {
+      return {
+        color: "yellow",
+        label: "Yellow",
+        message: "Aircraft has open discrepancies or upcoming attention items.",
+      };
+    }
+
+    if (maintenanceDrivers.some((item) => item.computed.color === "yellow")) {
+      return {
+        color: "yellow",
+        label: "Yellow",
+        message: "Aircraft has open discrepancies or upcoming attention items.",
+      };
+    }
+
+    return {
+      color: "green",
+      label: "Green",
+      message: "All systems good. No open discrepancies or upcoming maintenance.",
+    };
+  }, [discrepancies, maintenanceDrivers]);
+
   function showDiscrepancyDetails(item) {
     alert(
       `${item.title || "Untitled Discrepancy"}\n\n` +
-      `Category: ${item.category}\n` +
-      `Severity: ${item.severity}\n` +
-      `Grounding: ${item.is_grounding ? "Yes" : "No"}\n\n` +
-      `${item.description || "No description provided."}`
+        `Category: ${item.category}\n` +
+        `Severity: ${item.severity}\n` +
+        `Grounding: ${item.is_grounding ? "Yes" : "No"}\n\n` +
+        `${item.description || "No description provided."}`
     );
   }
 
@@ -183,32 +393,10 @@ export default function AircraftTrackerScreen() {
       is_grounding: item.is_grounding || false,
     });
 
-    alert("Discrepancy loaded into the form below. Edit it, then save as a new entry for now.");
+    alert(
+      "Discrepancy loaded into the form below. Edit it, then save as a new entry for now."
+    );
   }
-  
-  const aircraftStatus = useMemo(() => {
-    if (discrepancies.some((item) => item.is_grounding || item.severity === "red")) {
-      return {
-        color: "red",
-        label: "Red",
-        message: "Aircraft has a grounding discrepancy or is overdue for service/inspection.",
-      };
-    }
-
-    if (discrepancies.some((item) => item.severity === "yellow")) {
-      return {
-        color: "yellow",
-        label: "Yellow",
-        message: "Aircraft has open discrepancies or upcoming attention items.",
-      };
-    }
-
-    return {
-      color: "green",
-      label: "Green",
-      message: "All systems good. No open discrepancies.",
-    };
-  }, [discrepancies]);
 
   return (
     <div className="app-shell">
@@ -316,6 +504,7 @@ export default function AircraftTrackerScreen() {
                 onClick={() => {
                   setSelectedAircraft(null);
                   setDiscrepancies([]);
+                  setMaintenanceEvents([]);
                 }}
               >
                 ← Back to Fleet
@@ -348,8 +537,8 @@ export default function AircraftTrackerScreen() {
                 <div className={`card status-card ${aircraftStatus.color}`}>
                   <div className={`status-light ${aircraftStatus.color}`} />
                   <div className={`status-title ${aircraftStatus.color}`}>
-                      {aircraftStatus.label}
-                    </div>
+                    {aircraftStatus.label}
+                  </div>
                   <div className="status-message">{aircraftStatus.message}</div>
                 </div>
               </section>
@@ -360,10 +549,9 @@ export default function AircraftTrackerScreen() {
                   These are the items forcing the aircraft status color.
                 </p>
 
-                {discrepancies.length === 0 ? (
+                {discrepancies.length === 0 && maintenanceDrivers.length === 0 ? (
                   <div className="empty-small">
-                    No open discrepancies. Aircraft status is green unless
-                    maintenance items later drive a warning.
+                    No open discrepancies or upcoming maintenance items.
                   </div>
                 ) : (
                   <div className="status-list">
@@ -379,7 +567,8 @@ export default function AircraftTrackerScreen() {
                           </div>
 
                           <div className="status-item-meta">
-                            {item.category} · {item.is_grounding ? "Grounding" : "Non-grounding"}
+                            Discrepancy · {item.category} ·{" "}
+                            {item.is_grounding ? "Grounding" : "Non-grounding"}
                           </div>
 
                           <div className="status-item-description">
@@ -387,28 +576,44 @@ export default function AircraftTrackerScreen() {
                           </div>
                         </div>
 
-          <div className="status-actions">
-            <button
-              className="small-button"
-              onClick={() => showDiscrepancyDetails(item)}
-            >
-              Details
-            </button>
-          
-            <button
-              className="small-button edit-button"
-              onClick={() => editDiscrepancy(item)}
-            >
-              Edit
-            </button>
-          
-            <button
-              className="small-button close-button"
-              onClick={() => closeDiscrepancy(item.id)}
-            >
-              Close
-            </button>
-          </div>
+                        <div className="status-actions">
+                          <button className="small-button" onClick={() => showDiscrepancyDetails(item)}>
+                            Details
+                          </button>
+                          <button className="small-button edit-button" onClick={() => editDiscrepancy(item)}>
+                            Edit
+                          </button>
+                          <button className="small-button close-button" onClick={() => closeDiscrepancy(item.id)}>
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {maintenanceDrivers.map((item) => (
+                      <div className="status-item" key={item.id}>
+                        <div>
+                          <div className={`severity-dot ${item.computed.color}`} />
+                        </div>
+
+                        <div className="status-item-body">
+                          <div className="status-item-title">{item.item_name}</div>
+                          <div className="status-item-meta">
+                            Maintenance · {item.category} · {item.computed.label}
+                          </div>
+                          <div className="status-item-description">
+                            {item.computed.reason}
+                          </div>
+                        </div>
+
+                        <div className="status-actions">
+                          <button
+                            className="small-button close-button"
+                            onClick={() => closeMaintenanceEvent(item.id)}
+                          >
+                            Complete
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -416,35 +621,75 @@ export default function AircraftTrackerScreen() {
               </section>
 
               <section className="card">
-                <h2 className="section-title">Add Discrepancy</h2>
+                <h2 className="section-title">Add Maintenance Event</h2>
                 <p className="section-text">
-                  Add freeform pilot or maintenance notes. Photo and voice
-                  capture will be added next.
+                  Track recurring or one-time maintenance requirements such as oil
+                  changes, annual inspections, IFR/static checks, ELT batteries,
+                  engine events, or propeller events.
                 </p>
 
                 <div className="form-grid">
-                  <input
-                    className="input"
-                    placeholder="Short Title"
-                    value={discrepancyForm.title}
-                    onChange={(e) =>
-                      setDiscrepancyForm({
-                        ...discrepancyForm,
-                        title: e.target.value,
-                      })
-                    }
-                  />
+                  <input className="input" placeholder="Item Name, e.g. Oil Change" value={maintenanceForm.item_name} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, item_name: e.target.value })} />
 
-                  <select
-                    className="input"
-                    value={discrepancyForm.category}
-                    onChange={(e) =>
-                      setDiscrepancyForm({
-                        ...discrepancyForm,
-                        category: e.target.value,
-                      })
-                    }
-                  >
+                  <select className="input" value={maintenanceForm.category} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, category: e.target.value })}>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="inspection">Inspection</option>
+                    <option value="certification">Certification</option>
+                    <option value="engine">Engine</option>
+                    <option value="propeller">Propeller</option>
+                    <option value="avionics">Avionics</option>
+                    <option value="other">Other</option>
+                  </select>
+
+                  <select className="input" value={maintenanceForm.interval_type} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_type: e.target.value })}>
+                    <option value="hours">Hours</option>
+                    <option value="months">Months / Date</option>
+                    <option value="both">Hours and Date</option>
+                  </select>
+
+                  <input className="input" type="date" placeholder="Last Completed Date" value={maintenanceForm.last_completed_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_date: e.target.value })} />
+
+                  <input className="input" placeholder="Last Completed Tach" value={maintenanceForm.last_completed_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, last_completed_tach: e.target.value })} />
+
+                  <input className="input" placeholder="Interval Hours" value={maintenanceForm.interval_hours} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_hours: e.target.value })} />
+
+                  <input className="input" placeholder="Interval Months" value={maintenanceForm.interval_months} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, interval_months: e.target.value })} />
+
+                  <input className="input" placeholder="Due Tach" value={maintenanceForm.due_tach} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_tach: e.target.value })} />
+
+                  <input className="input" type="date" placeholder="Due Date" value={maintenanceForm.due_date} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, due_date: e.target.value })} />
+
+                  <input className="input" placeholder="Warning Percent" value={maintenanceForm.warning_percent} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, warning_percent: e.target.value })} />
+                </div>
+
+                <textarea
+                  className="input textarea"
+                  placeholder="Maintenance notes..."
+                  value={maintenanceForm.notes}
+                  onChange={(e) =>
+                    setMaintenanceForm({
+                      ...maintenanceForm,
+                      notes: e.target.value,
+                    })
+                  }
+                />
+
+                <button className="primary-button" onClick={addMaintenanceEvent}>
+                  Save Maintenance Event
+                </button>
+              </section>
+
+              <section className="card">
+                <h2 className="section-title">Add Discrepancy</h2>
+                <p className="section-text">
+                  Add freeform pilot or maintenance notes. Photo and voice capture
+                  will be added next.
+                </p>
+
+                <div className="form-grid">
+                  <input className="input" placeholder="Short Title" value={discrepancyForm.title} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, title: e.target.value })} />
+
+                  <select className="input" value={discrepancyForm.category} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, category: e.target.value })}>
                     <option value="airframe">Airframe</option>
                     <option value="avionics">Avionics</option>
                     <option value="electrical">Electrical</option>
@@ -458,53 +703,36 @@ export default function AircraftTrackerScreen() {
                     <option value="other">Other</option>
                   </select>
 
-                  <select
-                    className="input"
-                    value={discrepancyForm.severity}
-                    onChange={(e) =>
-                      setDiscrepancyForm({
-                        ...discrepancyForm,
-                        severity: e.target.value,
-                      })
-                    }
-                  >
+                  <select className="input" value={discrepancyForm.severity} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, severity: e.target.value })}>
                     <option value="yellow">Yellow — Non-grounding</option>
                     <option value="red">Red — Grounding / Do Not Fly</option>
                   </select>
                 </div>
 
-                <textarea
-                  className="input textarea"
-                  placeholder="Describe the discrepancy..."
-                  value={discrepancyForm.description}
-                  onChange={(e) =>
-                    setDiscrepancyForm({
-                      ...discrepancyForm,
-                      description: e.target.value,
-                    })
-                  }
-                />
+                <textarea className="input textarea" placeholder="Describe the discrepancy..." value={discrepancyForm.description} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, description: e.target.value })} />
 
-<div className="discrepancy-actions">
-  <label className="checkbox-row">
-    <input
-      type="checkbox"
-      checked={discrepancyForm.is_grounding}
-      onChange={(e) =>
-        setDiscrepancyForm({
-          ...discrepancyForm,
-          is_grounding: e.target.checked,
-          severity: e.target.checked ? "red" : discrepancyForm.severity,
-        })
-      }
-    />
-    Grounding item / aircraft should not fly
-  </label>
+                <div className="discrepancy-actions">
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={discrepancyForm.is_grounding}
+                      onChange={(e) =>
+                        setDiscrepancyForm({
+                          ...discrepancyForm,
+                          is_grounding: e.target.checked,
+                          severity: e.target.checked
+                            ? "red"
+                            : discrepancyForm.severity,
+                        })
+                      }
+                    />
+                    Grounding item / aircraft should not fly
+                  </label>
 
-  <button className="primary-button" onClick={addDiscrepancy}>
-    Save Discrepancy
-  </button>
-</div>
+                  <button className="primary-button" onClick={addDiscrepancy}>
+                    Save Discrepancy
+                  </button>
+                </div>
               </section>
             </>
           )}
