@@ -387,12 +387,28 @@ export default function AircraftTrackerScreen() {
                           </div>
                         </div>
 
-                        <button
-                          className="small-button"
-                          onClick={() => closeDiscrepancy(item.id)}
-                        >
-                          Close
-                        </button>
+          <div className="status-actions">
+            <button
+              className="small-button"
+              onClick={() => showDiscrepancyDetails(item)}
+            >
+              Details
+            </button>
+          
+            <button
+              className="small-button edit-button"
+              onClick={() => editDiscrepancy(item)}
+            >
+              Edit
+            </button>
+          
+            <button
+              className="small-button close-button"
+              onClick={() => closeDiscrepancy(item.id)}
+            >
+              Close
+            </button>
+          </div>
                       </div>
                     ))}
                   </div>
