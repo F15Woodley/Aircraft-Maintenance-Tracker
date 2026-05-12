@@ -112,6 +112,34 @@ async function signOut() {
     loadAircraft(data.id);
   }
 
+function isAdmin() {
+  return profile?.role === "admin";
+}
+
+function isMaintenance() {
+  return profile?.role === "maintenance";
+}
+
+function isPilot() {
+  return profile?.role === "pilot";
+}
+
+function canAddDiscrepancy() {
+  return isAdmin() || isMaintenance() || isPilot();
+}
+
+function canCloseDiscrepancy() {
+  return isAdmin() || isMaintenance();
+}
+
+function canManageMaintenance() {
+  return isAdmin() || isMaintenance();
+}
+
+function canUploadDocuments() {
+  return isAdmin() || isMaintenance() || isPilot();
+}
+  
   async function loadAircraft(companyId) {
     const { data, error } = await supabase
       .from("aircraft")
@@ -756,9 +784,11 @@ function openAircraftDashboard(plane) {
                           <button className="small-button edit-button" onClick={() => editDiscrepancy(item)}>
                             Edit
                           </button>
+                        {canCloseDiscrepancy() && (
                           <button className="small-button close-button" onClick={() => closeDiscrepancy(item.id)}>
                             Close
                           </button>
+                        )}
                         </div>
                       </div>
                     ))}
@@ -793,6 +823,7 @@ function openAircraftDashboard(plane) {
                 )}
               </section>
 
+            {canManageMaintenance() && (
               <section className="card">
                 <h2 className="section-title">Add Maintenance Event</h2>
                 <p className="section-text">
@@ -870,7 +901,8 @@ function openAircraftDashboard(plane) {
                 <button className="primary-button" onClick={addMaintenanceEvent}>
                   Save Maintenance Event
                 </button>
-              </section>
+                </section>
+                )}
 
               <section className="card">
   <h2 className="section-title">Aircraft Documents</h2>
@@ -880,6 +912,7 @@ function openAircraftDashboard(plane) {
     registrations, logbook images, and maintenance records.
   </p>
 
+{canUploadDocuments() && (
   <div className="document-upload-row">
     <label className="upload-button">
       {uploadingDocument ? "Uploading..." : "Upload Document"}
@@ -891,7 +924,8 @@ function openAircraftDashboard(plane) {
       />
     </label>
   </div>
-
+)}
+                
   {documents.length === 0 ? (
     <div className="empty-small">
       No aircraft documents uploaded yet.
@@ -930,7 +964,8 @@ function openAircraftDashboard(plane) {
   )}
 </section>
 
-              <section className="card">
+            {canAddDiscrepancy() && (
+            <section className="card">
                 <h2 className="section-title">Add Discrepancy</h2>
                 <p className="section-text">
                   Add freeform pilot or maintenance notes. Photo and voice capture
@@ -985,6 +1020,7 @@ function openAircraftDashboard(plane) {
                   </button>
                 </div>
               </section>
+              )}
             </>
           )}
         </main>
