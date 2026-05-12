@@ -809,14 +809,21 @@ function openAircraftDashboard(plane) {
                           </div>
                         </div>
 
-                        <div className="status-actions">
-                          <button
-                            className="small-button close-button"
-                            onClick={() => closeMaintenanceEvent(item.id)}
-                          >
-                            Complete
-                          </button>
-                        </div>
+                       <div className="status-actions">
+                        <button
+                          className="small-button"
+                          onClick={() => showMaintenanceDetails(item)}
+                        >
+                          Details
+                        </button>
+                      
+                        <button
+                          className="small-button close-button"
+                          onClick={() => closeMaintenanceEvent(item.id)}
+                        >
+                          Mark Complete
+                        </button>
+                      </div>
                       </div>
                     ))}
                   </div>
