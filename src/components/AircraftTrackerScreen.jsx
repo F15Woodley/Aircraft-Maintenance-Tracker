@@ -998,7 +998,7 @@ async function closeMaintenanceEvent(id) {
     <div className="field-label">Yellow Warning Threshold (%)</div>
     <input className="input" placeholder="e.g. 5" value={maintenanceForm.warning_percent} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, warning_percent: e.target.value })} />
   </div>
-</div>
+
                 <textarea
                   className="input textarea"
                   placeholder="Maintenance notes..."
