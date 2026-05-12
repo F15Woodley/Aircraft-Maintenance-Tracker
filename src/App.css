@@ -225,6 +225,24 @@ body {
   font-weight: 900;
 }
 
+.maintenance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.maintenance-grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .maintenance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .link-button {
   color: #93c5fd;
   border: 1px solid rgba(59, 130, 246, 0.45);
