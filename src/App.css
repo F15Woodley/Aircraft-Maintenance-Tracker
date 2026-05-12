@@ -180,6 +180,10 @@ body {
   margin-top: 32px;
 }
 
+.collapsible-form {
+  margin-top: 18px;
+}
+
 .empty-state {
   margin-top: 24px;
   text-align: center;
