@@ -922,15 +922,29 @@ async function closeMaintenanceEvent(id) {
               </section>
               )}
 
-            {canManageMaintenance() && (
-              <section className="card">
-                <h2 className="section-title">Add Maintenance Event</h2>
-                <p className="section-text">
-                  Track recurring or one-time maintenance requirements such as oil
-                  changes, annual inspections, IFR/static checks, ELT batteries,
-                  engine events, or propeller events.
-                </p>
+    {canManageMaintenance() && (
+  <section className="card">
+    <div className="section-header-row">
+      <div>
+        <h2 className="section-title">Maintenance</h2>
+        <p className="section-text">
+          Track recurring or one-time maintenance requirements such as oil
+          changes, annual inspections, IFR/static checks, ELT batteries,
+          engine events, or propeller events.
+        </p>
+      </div>
 
+      <button
+        className="secondary-button"
+        onClick={() => setShowMaintenanceForm(!showMaintenanceForm)}
+      >
+        {showMaintenanceForm ? "Cancel" : "+ Add Maintenance Event"}
+      </button>
+    </div>
+
+    {showMaintenanceForm && (
+      <div className="collapsible-form">
+        <div className="maintenance-grid">
            <div className="maintenance-grid">
   <input className="input" placeholder="Item Name, e.g. Oil Change" value={maintenanceForm.item_name} onChange={(e) => setMaintenanceForm({ ...maintenanceForm, item_name: e.target.value })} />
 
@@ -997,11 +1011,13 @@ async function closeMaintenanceEvent(id) {
                   }
                 />
 
-                <button className="primary-button" onClick={addMaintenanceEvent}>
-                  Save Maintenance Event
-                </button>
-                </section>
-                )}
+              <button className="primary-button" onClick={addMaintenanceEvent}>
+                Save Maintenance Event
+              </button>
+            </div>
+          )}
+        </section>
+      )}
 
               <section className="card">
   <h2 className="section-title">Aircraft Documents</h2>
