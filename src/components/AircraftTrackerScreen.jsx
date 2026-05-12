@@ -8,6 +8,8 @@ export default function AircraftTrackerScreen() {
   const [selectedAircraft, setSelectedAircraft] = useState(null);
   const [discrepancies, setDiscrepancies] = useState([]);
   const [maintenanceEvents, setMaintenanceEvents] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [uploadingDocument, setUploadingDocument] = useState(false);
 
   const [form, setForm] = useState({
     tail_number: "",
@@ -107,6 +109,21 @@ export default function AircraftTrackerScreen() {
     loadCompany();
   }, []);
 
+  async function loadDocuments(aircraftId) {
+  const { data, error } = await supabase
+    .from("aircraft_documents")
+    .select("*")
+    .eq("aircraft_id", aircraftId)
+    .order("uploaded_at", { ascending: false });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setDocuments(data || []);
+}
+
   async function addAircraft() {
     if (!company?.id) {
       alert("Company is still loading. Try again in a moment.");
@@ -140,11 +157,12 @@ export default function AircraftTrackerScreen() {
     loadAircraft(company.id);
   }
 
-  function openAircraftDashboard(plane) {
-    setSelectedAircraft(plane);
-    loadDiscrepancies(plane.id);
-    loadMaintenanceEvents(plane.id);
-  }
+function openAircraftDashboard(plane) {
+  setSelectedAircraft(plane);
+  loadDiscrepancies(plane.id);
+  loadMaintenanceEvents(plane.id);
+  loadDocuments(plane.id);
+}
 
   async function addDiscrepancy() {
     if (!selectedAircraft || !company) return;
@@ -373,6 +391,54 @@ export default function AircraftTrackerScreen() {
       message: "All systems good. No open discrepancies or upcoming maintenance.",
     };
   }, [discrepancies, maintenanceDrivers]);
+
+
+  async function uploadAircraftDocument(event) {
+  const file = event.target.files?.[0];
+
+  if (!file || !selectedAircraft || !company) return;
+
+  try {
+    setUploadingDocument(true);
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${selectedAircraft.tail_number}_${Date.now()}.${fileExt}`;
+
+    const filePath = `${company.id}/${selectedAircraft.id}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("aircraft-documents")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      alert(uploadError.message);
+      return;
+    }
+
+    const { error: dbError } = await supabase
+      .from("aircraft_documents")
+      .insert({
+        company_id: company.id,
+        aircraft_id: selectedAircraft.id,
+        title: file.name,
+        file_name: file.name,
+        file_path: filePath,
+        file_type: file.type,
+        file_size: file.size,
+        document_type: "general",
+        related_type: "aircraft",
+      });
+
+    if (dbError) {
+      alert(dbError.message);
+      return;
+    }
+
+    loadDocuments(selectedAircraft.id);
+  } finally {
+    setUploadingDocument(false);
+  }
+}
 
   function showDiscrepancyDetails(item) {
     alert(
@@ -698,6 +764,64 @@ export default function AircraftTrackerScreen() {
                   Save Maintenance Event
                 </button>
               </section>
+
+              <section className="card">
+  <h2 className="section-title">Aircraft Documents</h2>
+
+  <p className="section-text">
+    Upload annual inspections, invoices, discrepancy photos,
+    registrations, logbook images, and maintenance records.
+  </p>
+
+  <div className="document-upload-row">
+    <label className="upload-button">
+      {uploadingDocument ? "Uploading..." : "Upload Document"}
+
+      <input
+        type="file"
+        hidden
+        onChange={uploadAircraftDocument}
+      />
+    </label>
+  </div>
+
+  {documents.length === 0 ? (
+    <div className="empty-small">
+      No aircraft documents uploaded yet.
+    </div>
+  ) : (
+    <div className="document-list">
+      {documents.map((doc) => {
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("aircraft-documents")
+          .getPublicUrl(doc.file_path);
+
+        return (
+          <div className="document-item" key={doc.id}>
+            <div>
+              <div className="document-title">{doc.title}</div>
+
+              <div className="document-meta">
+                {doc.file_type || "Unknown type"}
+              </div>
+            </div>
+
+            <a
+              className="small-button"
+              href={publicUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open
+            </a>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</section>
 
               <section className="card">
                 <h2 className="section-title">Add Discrepancy</h2>
