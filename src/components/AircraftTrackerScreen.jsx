@@ -460,7 +460,7 @@ async function closeMaintenanceEvent(id) {
         color: "red",
         label: "Red",
         message:
-          "Aircraft grounded or maintenance overdue.",
+          "Aircraft has grounding discrepancy or overdue maintenance.",
       };
     }
 
