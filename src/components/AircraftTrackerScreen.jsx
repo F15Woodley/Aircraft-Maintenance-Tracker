@@ -346,19 +346,37 @@ function openAircraftDashboard(plane) {
     loadMaintenanceEvents(selectedAircraft.id);
   }
 
-  async function closeMaintenanceEvent(id) {
-    const { error } = await supabase
-      .from("aircraft_maintenance_events")
-      .update({ status: "completed" })
-      .eq("id", id);
+async function closeMaintenanceEvent(id) {
+  const completedDate = window.prompt(
+    "Enter completed date as YYYY-MM-DD, or leave blank for today:",
+    new Date().toISOString().slice(0, 10)
+  );
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+  if (completedDate === null) return;
 
-    loadMaintenanceEvents(selectedAircraft.id);
+  const completedTach = window.prompt(
+    "Enter completed tach time, or leave blank if not applicable:",
+    selectedAircraft?.current_tach || ""
+  );
+
+  if (completedTach === null) return;
+
+  const { error } = await supabase
+    .from("aircraft_maintenance_events")
+    .update({
+      status: "completed",
+      last_completed_date: completedDate || new Date().toISOString().slice(0, 10),
+      last_completed_tach: completedTach ? Number(completedTach) : null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  loadMaintenanceEvents(selectedAircraft.id);
+}
 
   function getMaintenanceStatus(item) {
     const currentTach = Number(selectedAircraft?.current_tach || 0);
