@@ -494,60 +494,53 @@ body {
     grid-template-columns: 1fr;
   }
 }
-<section className="card">
-  <h2 className="section-title">Aircraft Documents</h2>
 
-  <p className="section-text">
-    Upload annual inspections, invoices, discrepancy photos,
-    registrations, logbook images, and maintenance records.
-  </p>
+.document-upload-row {
+  margin-top: 20px;
+}
 
-  <div className="document-upload-row">
-    <label className="upload-button">
-      {uploadingDocument ? "Uploading..." : "Upload Document"}
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 16px;
+  padding: 14px 24px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-      <input
-        type="file"
-        hidden
-        onChange={uploadAircraftDocument}
-      />
-    </label>
-  </div>
+.upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.4);
+}
 
-  {documents.length === 0 ? (
-    <div className="empty-small">
-      No aircraft documents uploaded yet.
-    </div>
-  ) : (
-    <div className="document-list">
-      {documents.map((doc) => {
-        const {
-          data: { publicUrl },
-        } = supabase.storage
-          .from("aircraft-documents")
-          .getPublicUrl(doc.file_path);
+.document-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
 
-        return (
-          <div className="document-item" key={doc.id}>
-            <div>
-              <div className="document-title">{doc.title}</div>
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
 
-              <div className="document-meta">
-                {doc.file_type || "Unknown type"}
-              </div>
-            </div>
+.document-title {
+  font-size: 16px;
+  font-weight: 800;
+}
 
-            <a
-              className="small-button"
-              href={publicUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open
-            </a>
-          </div>
-        );
-      })}
-    </div>
-  )}
-</section>
+.document-meta {
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 13px;
+}
