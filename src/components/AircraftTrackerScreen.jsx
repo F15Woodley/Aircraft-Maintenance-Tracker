@@ -848,6 +848,64 @@ async function closeMaintenanceEvent(id) {
                 )}
               </section>
 
+                {canAddDiscrepancy() && (
+            <section className="card">
+                <h2 className="section-title">Add Discrepancy</h2>
+                <p className="section-text">
+                  Add freeform pilot or maintenance notes. Photo and voice capture
+                  will be added next.
+                </p>
+
+                <div className="form-grid">
+                  <input className="input" placeholder="Short Title" value={discrepancyForm.title} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, title: e.target.value })} />
+
+                  <select className="input" value={discrepancyForm.category} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, category: e.target.value })}>
+                    <option value="airframe">Airframe</option>
+                    <option value="avionics">Avionics</option>
+                    <option value="electrical">Electrical</option>
+                    <option value="engine">Engine</option>
+                    <option value="propeller">Propeller</option>
+                    <option value="landing_gear">Landing Gear</option>
+                    <option value="environmental">Environmental / Cabin</option>
+                    <option value="fuel">Fuel System</option>
+                    <option value="hydraulic">Hydraulic System</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="other">Other</option>
+                  </select>
+
+                  <select className="input" value={discrepancyForm.severity} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, severity: e.target.value })}>
+                    <option value="yellow">Yellow — Non-grounding</option>
+                    <option value="red">Red — Grounding / Do Not Fly</option>
+                  </select>
+                </div>
+
+                <textarea className="input textarea" placeholder="Describe the discrepancy..." value={discrepancyForm.description} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, description: e.target.value })} />
+
+                <div className="discrepancy-actions">
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={discrepancyForm.is_grounding}
+                      onChange={(e) =>
+                        setDiscrepancyForm({
+                          ...discrepancyForm,
+                          is_grounding: e.target.checked,
+                          severity: e.target.checked
+                            ? "red"
+                            : discrepancyForm.severity,
+                        })
+                      }
+                    />
+                    Grounding item / aircraft should not fly
+                  </label>
+
+                  <button className="primary-button" onClick={addDiscrepancy}>
+                    Save Discrepancy
+                  </button>
+                </div>
+              </section>
+              )}
+
             {canManageMaintenance() && (
               <section className="card">
                 <h2 className="section-title">Add Maintenance Event</h2>
@@ -988,64 +1046,6 @@ async function closeMaintenanceEvent(id) {
     </div>
   )}
 </section>
-
-            {canAddDiscrepancy() && (
-            <section className="card">
-                <h2 className="section-title">Add Discrepancy</h2>
-                <p className="section-text">
-                  Add freeform pilot or maintenance notes. Photo and voice capture
-                  will be added next.
-                </p>
-
-                <div className="form-grid">
-                  <input className="input" placeholder="Short Title" value={discrepancyForm.title} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, title: e.target.value })} />
-
-                  <select className="input" value={discrepancyForm.category} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, category: e.target.value })}>
-                    <option value="airframe">Airframe</option>
-                    <option value="avionics">Avionics</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="engine">Engine</option>
-                    <option value="propeller">Propeller</option>
-                    <option value="landing_gear">Landing Gear</option>
-                    <option value="environmental">Environmental / Cabin</option>
-                    <option value="fuel">Fuel System</option>
-                    <option value="hydraulic">Hydraulic System</option>
-                    <option value="documentation">Documentation</option>
-                    <option value="other">Other</option>
-                  </select>
-
-                  <select className="input" value={discrepancyForm.severity} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, severity: e.target.value })}>
-                    <option value="yellow">Yellow — Non-grounding</option>
-                    <option value="red">Red — Grounding / Do Not Fly</option>
-                  </select>
-                </div>
-
-                <textarea className="input textarea" placeholder="Describe the discrepancy..." value={discrepancyForm.description} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, description: e.target.value })} />
-
-                <div className="discrepancy-actions">
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      checked={discrepancyForm.is_grounding}
-                      onChange={(e) =>
-                        setDiscrepancyForm({
-                          ...discrepancyForm,
-                          is_grounding: e.target.checked,
-                          severity: e.target.checked
-                            ? "red"
-                            : discrepancyForm.severity,
-                        })
-                      }
-                    />
-                    Grounding item / aircraft should not fly
-                  </label>
-
-                  <button className="primary-button" onClick={addDiscrepancy}>
-                    Save Discrepancy
-                  </button>
-                </div>
-              </section>
-              )}
             </>
           )}
         </main>
