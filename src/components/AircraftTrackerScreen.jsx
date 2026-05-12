@@ -14,6 +14,8 @@ export default function AircraftTrackerScreen() {
   const [maintenanceEvents, setMaintenanceEvents] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [showDiscrepancyForm, setShowDiscrepancyForm] = useState(false);
+  const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
 
   const [form, setForm] = useState({
     tail_number: "",
@@ -277,6 +279,7 @@ function openAircraftDashboard(plane) {
     });
 
     loadDiscrepancies(selectedAircraft.id);
+    setShowDiscrepancyForm(false);
   }
 
   async function closeDiscrepancy(id) {
@@ -344,6 +347,7 @@ function openAircraftDashboard(plane) {
     });
 
     loadMaintenanceEvents(selectedAircraft.id);
+    setShowMaintenanceForm(false);
   }
 
 async function closeMaintenanceEvent(id) {
@@ -850,13 +854,24 @@ async function closeMaintenanceEvent(id) {
 
                 {canAddDiscrepancy() && (
             <section className="card">
-                <h2 className="section-title">Add Discrepancy</h2>
+            <div className="section-header-row">
+              <div>
+                <h2 className="section-title">Discrepancies</h2>
                 <p className="section-text">
-                  Add freeform pilot or maintenance notes. Photo and voice capture
-                  will be added next.
+                  Add freeform pilot or maintenance notes. Photo and voice capture will be added next.
                 </p>
+              </div>
+            
+              <button
+                className="secondary-button"
+                onClick={() => setShowDiscrepancyForm(!showDiscrepancyForm)}
+              >
+                {showDiscrepancyForm ? "Cancel" : "+ Add Discrepancy"}
+              </button>
+            </div>
 
-                <div className="form-grid">
+                {showDiscrepancyForm && (
+              <div className="form-grid">
                   <input className="input" placeholder="Short Title" value={discrepancyForm.title} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, title: e.target.value })} />
 
                   <select className="input" value={discrepancyForm.category} onChange={(e) => setDiscrepancyForm({ ...discrepancyForm, category: e.target.value })}>
@@ -903,6 +918,7 @@ async function closeMaintenanceEvent(id) {
                     Save Discrepancy
                   </button>
                 </div>
+              )}
               </section>
               )}
 
