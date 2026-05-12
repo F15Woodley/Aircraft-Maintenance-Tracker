@@ -567,7 +567,17 @@ function openAircraftDashboard(plane) {
           </div>
 
       <div className="topbar-actions">
-        <button className="nav-button">Fleet Ops</button>
+<button
+  className="nav-button"
+  onClick={() => {
+    setSelectedAircraft(null);
+    setDiscrepancies([]);
+    setMaintenanceEvents([]);
+    setDocuments([]);
+  }}
+>
+  Fleet Ops
+</button>
         <button className="nav-button">Maintenance</button>
         <button className="nav-button" onClick={signOut}>
           Sign Out
