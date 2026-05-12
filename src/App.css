@@ -176,6 +176,29 @@ body {
   box-shadow: 0 0 24px rgba(59, 130, 246, 0.45);
 }
 
+.secondary-button {
+  width: 100%;
+  margin-top: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondary-button:hover {
+  border-color: rgba(59,130,246,0.55);
+  background: rgba(59,130,246,0.12);
+}
+
+.section-header-row {
+  display: block;
+}
+
 .fleet-section {
   margin-top: 32px;
 }
