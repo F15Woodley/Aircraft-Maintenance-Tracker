@@ -4,6 +4,10 @@ import "../App.css";
 
 export default function AircraftTrackerScreen() {
   const [aircraft, setAircraft] = useState([]);
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
   const [company, setCompany] = useState(null);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
   const [discrepancies, setDiscrepancies] = useState([]);
@@ -42,6 +46,56 @@ export default function AircraftTrackerScreen() {
     notes: "",
   });
 
+async function loadSession() {
+  const { data } = await supabase.auth.getSession();
+
+  setSession(data.session);
+
+  if (data.session?.user?.id) {
+    loadProfile(data.session.user.id);
+  }
+}
+
+async function loadProfile(userId) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*, companies(*)")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setProfile(data);
+  setCompany(data.companies);
+  loadAircraft(data.company_id);
+}
+
+async function signIn() {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: authEmail,
+    password: authPassword,
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  loadSession();
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  setSession(null);
+  setProfile(null);
+  setCompany(null);
+  setAircraft([]);
+  setSelectedAircraft(null);
+}
+  
   async function loadCompany() {
     const { data, error } = await supabase
       .from("companies")
@@ -105,9 +159,9 @@ export default function AircraftTrackerScreen() {
     setMaintenanceEvents(data || []);
   }
 
-  useEffect(() => {
-    loadCompany();
-  }, []);
+useEffect(() => {
+  loadSession();
+}, []);
 
   async function loadDocuments(aircraftId) {
   const { data, error } = await supabase
@@ -464,6 +518,46 @@ function openAircraftDashboard(plane) {
     );
   }
 
+  if (!session) {
+  return (
+    <div className="app-shell">
+      <div className="dashboard">
+        <main className="content">
+          <section className="card">
+            <div className="eyebrow">SECURE ACCESS</div>
+            <h1 className="hero-title">Aircraft Maintenance Tracker</h1>
+            <p className="section-text">
+              Sign in to access your company aircraft, maintenance records,
+              discrepancies, and documents.
+            </p>
+
+            <div className="form-grid">
+              <input
+                className="input"
+                placeholder="Email"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+              />
+
+              <input
+                className="input"
+                placeholder="Password"
+                type="password"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+              />
+            </div>
+
+            <button className="primary-button" onClick={signIn}>
+              Sign In
+            </button>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}
+
   return (
     <div className="app-shell">
       <div className="dashboard">
@@ -472,10 +566,13 @@ function openAircraftDashboard(plane) {
             {company?.name || "Aircraft Maintenance Tracker"}
           </div>
 
-          <div className="topbar-actions">
-            <button className="nav-button">Fleet Ops</button>
-            <button className="nav-button">Maintenance</button>
-          </div>
+      <div className="topbar-actions">
+        <button className="nav-button">Fleet Ops</button>
+        <button className="nav-button">Maintenance</button>
+        <button className="nav-button" onClick={signOut}>
+          Sign Out
+        </button>
+      </div>
         </div>
 
         <main className="content">
