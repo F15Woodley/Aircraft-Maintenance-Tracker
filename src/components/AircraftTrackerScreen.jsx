@@ -1494,6 +1494,94 @@ async function saveFlightLog() {
 </section>
             </>
           )}
+{showFlightDetails && selectedFlightLog && (
+  <div className="modal-backdrop">
+    <div className="modal-card">
+      <div className="section-header-row">
+        <div>
+          <h2 className="section-title">
+            Flight Details
+          </h2>
+          <p className="section-text">
+            {selectedFlightLog.departure || "—"} →{" "}
+            {selectedFlightLog.destination || "—"} ·{" "}
+            {selectedFlightLog.flight_date || "No date"}
+          </p>
+        </div>
+
+        <button
+          className="small-button"
+          onClick={() => {
+            setShowFlightDetails(false);
+            setSelectedFlightLog(null);
+          }}
+        >
+          Close
+        </button>
+      </div>
+
+      <div className="detail-grid">
+        <div>
+          <strong>Pilot</strong>
+          <p>{selectedFlightLog.pilot || "—"}</p>
+        </div>
+
+        <div>
+          <strong>Co-Pilot</strong>
+          <p>{selectedFlightLog.copilot || "—"}</p>
+        </div>
+
+        <div>
+          <strong>Hobbs</strong>
+          <p>
+            {selectedFlightLog.hobbs_out || "—"} →{" "}
+            {selectedFlightLog.hobbs_in || "—"}
+          </p>
+        </div>
+
+        <div>
+          <strong>Tach</strong>
+          <p>
+            {selectedFlightLog.tach_out || "—"} →{" "}
+            {selectedFlightLog.tach_in || "—"}
+          </p>
+        </div>
+
+        <div>
+          <strong>Flight Time</strong>
+          <p>{selectedFlightLog.flight_time || "—"} hrs</p>
+        </div>
+
+        <div>
+          <strong>Landings</strong>
+          <p>{selectedFlightLog.landings || 0}</p>
+        </div>
+      </div>
+
+      <div className="modal-actions">
+        <button
+          className="primary-button"
+          onClick={() => {
+            setShowFlightDetails(false);
+            setShowDiscrepancyForm(true);
+            setDiscrepancyForm({
+              title: "",
+              description: "",
+              category: "other",
+              severity: "yellow",
+              is_grounding: false,
+              flight_log_id: selectedFlightLog.id,
+            });
+          }}
+        >
+          + Add Discrepancy to This Flight
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+          
         </main>
       </div>
     </div>
