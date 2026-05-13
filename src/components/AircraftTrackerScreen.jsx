@@ -769,6 +769,7 @@ async function saveFlightLog() {
                   <div className="stat-number green">{aircraft.length}</div>
                   <div className="stat-label">Currently Active</div>
                 </div>
+                </section>
       <section className="fleet-section">
   <h2 className="section-title">Fleet</h2>
   <p className="section-text">
