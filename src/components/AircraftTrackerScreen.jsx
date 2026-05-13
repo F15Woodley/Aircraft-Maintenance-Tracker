@@ -1111,28 +1111,49 @@ async function saveFlightLog() {
       No flight logs recorded yet.
     </div>
   ) : (
-    <div className="status-list">
-      {flightLogs.slice(0, 3).map((flight) => (
-        <div className="status-item" key={flight.id}>
-          <div className="status-item-body">
-            <div className="status-item-title">
-              {flight.departure || "---"} →{" "}
-              {flight.destination || "---"}
-            </div>
+ <div className="flight-log-table">
+  <div className="flight-log-header">
+    <div>Status</div>
+    <div>Date</div>
+    <div>Route</div>
+    <div>Crew</div>
+    <div>Hobbs</div>
+    <div>Tach</div>
+    <div>Time</div>
+    <div>Landings</div>
+  </div>
 
-            <div className="status-item-meta">
-              {flight.flight_date} · Pilot:{" "}
-              {flight.pilot || "Unknown"}
-            </div>
+  {flightLogs.slice(0, 3).map((flight) => (
+    <div className="flight-log-row" key={flight.id}>
+      <div>
+        <span className="flight-status-dot green" title="No discrepancies"></span>
+      </div>
 
-            <div className="status-item-description">
-              Flight Time: {flight.flight_time || 0} hrs ·
-              Landings: {flight.landings || 0}
-            </div>
-          </div>
-        </div>
-      ))}
+      <div>{flight.flight_date || "—"}</div>
+
+      <div>
+        <strong>{flight.departure || "—"} → {flight.destination || "—"}</strong>
+      </div>
+
+      <div>
+        {flight.pilot || "—"}
+        {flight.copilot ? ` / ${flight.copilot}` : ""}
+      </div>
+
+      <div>
+        {flight.hobbs_out || "—"} → {flight.hobbs_in || "—"}
+      </div>
+
+      <div>
+        {flight.tach_out || "—"} → {flight.tach_in || "—"}
+      </div>
+
+      <div>{flight.flight_time || "—"} hrs</div>
+
+      <div>{flight.landings || 0}</div>
     </div>
+  ))}
+</div>
   )}
 </section>
 
