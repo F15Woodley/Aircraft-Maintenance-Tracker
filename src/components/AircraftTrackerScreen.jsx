@@ -6,7 +6,7 @@ export default function AircraftTrackerScreen() {
   const [aircraft, setAircraft] = useState([]);
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [authEmail, setAuthEmail] = useState("");
+  const [authEmail, setAuthEmail] = useState("");F
   const [authPassword, setAuthPassword] = useState("");
   const [company, setCompany] = useState(null);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
@@ -20,6 +20,8 @@ export default function AircraftTrackerScreen() {
   const [flightLogs, setFlightLogs] = useState([]);
   const [showFlightForm, setShowFlightForm] = useState(false);
   const [savingFlight, setSavingFlight] = useState(false);
+  const [selectedFlightLog, setSelectedFlightLog] = useState(null);
+  const [showFlightDetails, setShowFlightDetails] = useState(false);
   
   const [flightForm, setFlightForm] = useState({
     pilot: "",
@@ -178,6 +180,12 @@ function canManageMaintenance() {
 function canUploadDocuments() {
   return isAdmin() || isMaintenance() || isPilot();
 }
+
+  function openFlightDetails(flight) {
+  setSelectedFlightLog(flight);
+  setShowFlightDetails(true);
+}
+  
   
   async function loadAircraft(companyId) {
     const { data, error } = await supabase
@@ -1124,7 +1132,11 @@ async function saveFlightLog() {
   </div>
 
   {flightLogs.slice(0, 3).map((flight) => (
-    <div className="flight-log-row" key={flight.id}>
+        <div
+      className="flight-log-row clickable-row"
+      key={flight.id}
+      onClick={() => openFlightDetails(flight)}
+    >
       <div>
         <span className="flight-status-dot green" title="No discrepancies"></span>
       </div>
