@@ -846,6 +846,10 @@ async function saveFlightLog() {
     </div>
   )}
 </section>
+            </>
+          ) : (
+            <>
+              
               <section className="hero-grid">
                 <div className="card">
                   <div className="eyebrow">AIRCRAFT DASHBOARD</div>
