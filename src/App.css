@@ -209,6 +209,25 @@ body {
   margin-top: 18px;
 }
 
+.flight-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-header-row .section-text {
+  margin-top: 4px;
+}
+
+
 .empty-state {
   margin-top: 24px;
   text-align: center;
