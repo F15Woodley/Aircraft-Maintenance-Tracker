@@ -1115,8 +1115,9 @@ async function saveFlightLog() {
           setFlightForm({ ...flightForm, notes: e.target.value })
         }
       />
+</div>
 
-<div className="flight-form-actions">
+  <div className="flight-form-actions">
   <button
     className="primary-button"
     onClick={saveFlightLog}
@@ -1132,7 +1133,6 @@ async function saveFlightLog() {
   >
     {addFlightDiscrepancy ? "Remove Discrepancy" : "+ Add Discrepancy to Flight"}
   </button>
-</div>
     </div>
   )}
 
