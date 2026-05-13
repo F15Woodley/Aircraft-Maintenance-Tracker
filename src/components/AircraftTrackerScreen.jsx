@@ -106,12 +106,20 @@ async function loadProfile(userId) {
   loadAircraft(data.company_id);
 }
 
-  async function loadFlightLogs(aircraftId) {
+async function loadFlightLogs(aircraftId) {
   if (!aircraftId) return;
 
   const { data, error } = await supabase
     .from("flight_logs")
-    .select("*")
+    .select(`
+      *,
+      aircraft_discrepancies (
+        id,
+        severity,
+        is_grounding,
+        status
+      )
+    `)
     .eq("aircraft_id", aircraftId)
     .order("flight_date", { ascending: false })
     .order("created_at", { ascending: false });
@@ -196,6 +204,24 @@ function canUploadDocuments() {
   setShowFlightDetails(true);
 }
   
+  function getFlightStatusColor(flight) {
+  const linkedDiscrepancies =
+    flight.aircraft_discrepancies?.filter((item) => item.status === "open") || [];
+
+  if (
+    linkedDiscrepancies.some(
+      (item) => item.is_grounding || item.severity === "red"
+    )
+  ) {
+    return "red";
+  }
+
+  if (linkedDiscrepancies.length > 0) {
+    return "yellow";
+  }
+
+  return "green";
+}
   
   async function loadAircraft(companyId) {
     const { data, error } = await supabase
@@ -1267,7 +1293,16 @@ async function saveFlightLog() {
       onClick={() => openFlightDetails(flight)}
     >
       <div>
-        <span className="flight-status-dot green" title="No discrepancies"></span>
+        <span
+  className={`flight-status-dot ${getFlightStatusColor(flight)}`}
+  title={
+    getFlightStatusColor(flight) === "green"
+      ? "No linked discrepancies"
+      : getFlightStatusColor(flight) === "yellow"
+      ? "Linked non-grounding discrepancy"
+      : "Linked grounding or red discrepancy"
+  }
+/>
       </div>
 
       <div>{flight.flight_date || "—"}</div>
