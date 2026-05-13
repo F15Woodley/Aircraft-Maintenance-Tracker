@@ -741,51 +741,6 @@ async function saveFlightLog() {
   loadFlightLogs(selectedAircraft.id);
   loadDiscrepancies(selectedAircraft.id);
 }
-if (addFlightDiscrepancy && flightDiscrepancyForm.title.trim()) {
-  const isRed =
-    flightDiscrepancyForm.severity === "red" ||
-    flightDiscrepancyForm.is_grounding;
-
-  const { error: discrepancyError } = await supabase
-    .from("aircraft_discrepancies")
-    .insert({
-      company_id: company.id,
-      aircraft_id: selectedAircraft.id,
-      flight_log_id: newFlightRows.id,
-      title: flightDiscrepancyForm.title.trim(),
-      description: flightDiscrepancyForm.description.trim(),
-      category: flightDiscrepancyForm.category,
-      severity: isRed ? "red" : flightDiscrepancyForm.severity,
-      is_grounding: flightDiscrepancyForm.is_grounding,
-      status: "open",
-    });
-
-  if (discrepancyError) {
-    alert(discrepancyError.message);
-    return;
-  }
-}
-  
-
-  setFlightForm({
-    pilot: "",
-    copilot: "",
-    flight_date: "",
-    departure: "",
-    destination: "",
-    hobbs_out: "",
-    hobbs_in: "",
-    tach_out: "",
-    tach_in: "",
-    flight_time: "",
-    landings: "",
-    notes: "",
-  });
-
-  setShowFlightForm(false);
-  loadFlightLogs(selectedAircraft.id);
-}
-  
 
   if (!session) {
   return (
