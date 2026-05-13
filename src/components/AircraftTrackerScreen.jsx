@@ -636,7 +636,7 @@ async function saveFlightLog() {
     {
       aircraft_id: selectedAircraft.id,
       pilot: flightForm.pilot || null,
-      copilot: flightForm.copilot || null,
+      copilot: flightForm.copilot?.trim() ? flightForm.copilot.trim() : null,
       flight_date: flightForm.flight_date,
       departure: flightForm.departure || null,
       destination: flightForm.destination || null,
