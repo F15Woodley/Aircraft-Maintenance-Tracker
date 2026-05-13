@@ -1007,7 +1007,8 @@ async function saveFlightLog() {
   </div>
 
   {showFlightForm && (
-    <div className="flight-form-grid">
+    <>
+     <div className="flight-form-grid">
       <input
         className="input"
         placeholder="Pilot"
@@ -1134,6 +1135,7 @@ async function saveFlightLog() {
     {addFlightDiscrepancy ? "Remove Discrepancy" : "+ Add Discrepancy to Flight"}
   </button>
     </div>
+      </>
   )}
 
 {addFlightDiscrepancy && (
