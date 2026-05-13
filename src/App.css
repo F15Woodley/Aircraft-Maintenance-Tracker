@@ -156,6 +156,14 @@ body {
   color: #94a3b8;
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: rgba(59, 130, 246, 0.12);
+}
+
 .primary-button {
   margin-top: 22px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
