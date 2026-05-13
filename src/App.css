@@ -205,6 +205,19 @@ body {
   background: rgba(59,130,246,0.12);
 }
 
+.flight-discrepancy-button {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  transition: all 0.18s ease;
+}
+
+.flight-discrepancy-button:hover {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.75);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
+}
+
 .section-header-row {
   display: block;
 }
