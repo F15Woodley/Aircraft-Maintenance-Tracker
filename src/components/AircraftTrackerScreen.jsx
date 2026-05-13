@@ -1108,7 +1108,10 @@ async function saveFlightLog() {
         placeholder="Departure"
         value={flightForm.departure}
         onChange={(e) =>
-          setFlightForm({ ...flightForm, departure: e.target.value })
+          setFlightForm({
+            ...flightForm,
+            departure: e.target.value.toUpperCase(),
+          })
         }
       />
 
@@ -1117,7 +1120,10 @@ async function saveFlightLog() {
         placeholder="Destination"
         value={flightForm.destination}
         onChange={(e) =>
-          setFlightForm({ ...flightForm, destination: e.target.value })
+          setFlightForm({
+            ...flightForm,
+            destination: e.target.value.toUpperCase(),
+          })
         }
       />
 
