@@ -53,6 +53,7 @@ export default function AircraftTrackerScreen() {
     category: "other",
     severity: "yellow",
     is_grounding: false,
+    flight_log_id: null,
   });
 
   const [maintenanceForm, setMaintenanceForm] = useState({
@@ -303,16 +304,17 @@ function openAircraftDashboard(plane) {
     const isRed =
       discrepancyForm.severity === "red" || discrepancyForm.is_grounding;
 
-    const { error } = await supabase.from("aircraft_discrepancies").insert({
-      company_id: company.id,
-      aircraft_id: selectedAircraft.id,
-      title: discrepancyForm.title.trim(),
-      description: discrepancyForm.description.trim(),
-      category: discrepancyForm.category,
-      severity: isRed ? "red" : discrepancyForm.severity,
-      is_grounding: discrepancyForm.is_grounding,
-      status: "open",
-    });
+const { error } = await supabase.from("aircraft_discrepancies").insert({
+  company_id: company.id,
+  aircraft_id: selectedAircraft.id,
+  flight_log_id: discrepancyForm.flight_log_id || null,
+  title: discrepancyForm.title.trim(),
+  description: discrepancyForm.description.trim(),
+  category: discrepancyForm.category,
+  severity: isRed ? "red" : discrepancyForm.severity,
+  is_grounding: discrepancyForm.is_grounding,
+  status: "open",
+});
 
     if (error) {
       alert(error.message);
@@ -325,6 +327,7 @@ function openAircraftDashboard(plane) {
       category: "other",
       severity: "yellow",
       is_grounding: false,
+      flight_log_id: null,
     });
 
     loadDiscrepancies(selectedAircraft.id);
