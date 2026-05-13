@@ -656,30 +656,116 @@ async function saveFlightLog() {
       ? Number(flightForm.flight_time)
       : null;
 
-  const { error } = await supabase.from("flight_logs").insert([
-    {
-      aircraft_id: selectedAircraft.id,
-      pilot: flightForm.pilot || null,
-      copilot: flightForm.copilot?.trim() ? flightForm.copilot.trim() : null,
-      flight_date: flightForm.flight_date,
-      departure: flightForm.departure || null,
-      destination: flightForm.destination || null,
-      hobbs_out: hobbsOut,
-      hobbs_in: hobbsIn,
-      tach_out: tachOut,
-      tach_in: tachIn,
-      flight_time: calculatedFlightTime,
-      landings: flightForm.landings ? Number(flightForm.landings) : 0,
-      notes: flightForm.notes || null,
-    },
-  ]);
-
-  setSavingFlight(false);
+  const { data: newFlight, error } = await supabase
+    .from("flight_logs")
+    .insert([
+      {
+        aircraft_id: selectedAircraft.id,
+        pilot: flightForm.pilot || null,
+        copilot: flightForm.copilot?.trim() ? flightForm.copilot.trim() : null,
+        flight_date: flightForm.flight_date,
+        departure: flightForm.departure || null,
+        destination: flightForm.destination || null,
+        hobbs_out: hobbsOut,
+        hobbs_in: hobbsIn,
+        tach_out: tachOut,
+        tach_in: tachIn,
+        flight_time: calculatedFlightTime,
+        landings: flightForm.landings ? Number(flightForm.landings) : 0,
+        notes: flightForm.notes || null,
+      },
+    ])
+    .select()
+    .single();
 
   if (error) {
+    setSavingFlight(false);
     alert(error.message);
     return;
   }
+
+  if (addFlightDiscrepancy && flightDiscrepancyForm.title.trim()) {
+    const isRed =
+      flightDiscrepancyForm.severity === "red" ||
+      flightDiscrepancyForm.is_grounding;
+
+    const { error: discrepancyError } = await supabase
+      .from("aircraft_discrepancies")
+      .insert({
+        company_id: company.id,
+        aircraft_id: selectedAircraft.id,
+        flight_log_id: newFlight.id,
+        title: flightDiscrepancyForm.title.trim(),
+        description: flightDiscrepancyForm.description.trim(),
+        category: flightDiscrepancyForm.category,
+        severity: isRed ? "red" : flightDiscrepancyForm.severity,
+        is_grounding: flightDiscrepancyForm.is_grounding,
+        status: "open",
+      });
+
+    if (discrepancyError) {
+      setSavingFlight(false);
+      alert(discrepancyError.message);
+      return;
+    }
+  }
+
+  setFlightForm({
+    pilot: "",
+    copilot: "",
+    flight_date: "",
+    departure: "",
+    destination: "",
+    hobbs_out: "",
+    hobbs_in: "",
+    tach_out: "",
+    tach_in: "",
+    flight_time: "",
+    landings: "",
+    notes: "",
+  });
+
+  setAddFlightDiscrepancy(false);
+
+  setFlightDiscrepancyForm({
+    title: "",
+    description: "",
+    category: "other",
+    severity: "yellow",
+    is_grounding: false,
+  });
+
+  setSavingFlight(false);
+  setShowFlightForm(false);
+
+  loadFlightLogs(selectedAircraft.id);
+  loadDiscrepancies(selectedAircraft.id);
+}
+if (addFlightDiscrepancy && flightDiscrepancyForm.title.trim()) {
+  const isRed =
+    flightDiscrepancyForm.severity === "red" ||
+    flightDiscrepancyForm.is_grounding;
+
+  const { error: discrepancyError } = await supabase
+    .from("aircraft_discrepancies")
+    .insert({
+      company_id: company.id,
+      aircraft_id: selectedAircraft.id,
+      flight_log_id: newFlightRows.id,
+      title: flightDiscrepancyForm.title.trim(),
+      description: flightDiscrepancyForm.description.trim(),
+      category: flightDiscrepancyForm.category,
+      severity: isRed ? "red" : flightDiscrepancyForm.severity,
+      is_grounding: flightDiscrepancyForm.is_grounding,
+      status: "open",
+    });
+
+  if (discrepancyError) {
+    alert(discrepancyError.message);
+    return;
+  }
+}
+  
 
   setFlightForm({
     pilot: "",
