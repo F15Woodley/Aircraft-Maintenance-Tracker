@@ -16,6 +16,24 @@ export default function AircraftTrackerScreen() {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [showDiscrepancyForm, setShowDiscrepancyForm] = useState(false);
   const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
+  const [flightLogs, setFlightLogs] = useState([]);
+  const [showFlightForm, setShowFlightForm] = useState(false);
+  const [savingFlight, setSavingFlight] = useState(false);
+  
+  const [flightForm, setFlightForm] = useState({
+    pilot: "",
+    copilot: "",
+    flight_date: "",
+    departure: "",
+    destination: "",
+    hobbs_out: "",
+    hobbs_in: "",
+    tach_out: "",
+    tach_in: "",
+    flight_time: "",
+    landings: "",
+    notes: "",
+  });
 
   const [form, setForm] = useState({
     tail_number: "",
@@ -73,6 +91,24 @@ async function loadProfile(userId) {
   setProfile(data);
   setCompany(data.companies);
   loadAircraft(data.company_id);
+}
+
+  async function loadFlightLogs(aircraftId) {
+  if (!aircraftId) return;
+
+  const { data, error } = await supabase
+    .from("flight_logs")
+    .select("*")
+    .eq("aircraft_id", aircraftId)
+    .order("flight_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading flight logs:", error);
+    return;
+  }
+
+  setFlightLogs(data || []);
 }
 
 async function signIn() {
@@ -246,6 +282,7 @@ function openAircraftDashboard(plane) {
   loadDiscrepancies(plane.id);
   loadMaintenanceEvents(plane.id);
   loadDocuments(plane.id);
+  loadFlightLogs(plane.id)
 }
 
   async function addDiscrepancy() {
@@ -568,6 +605,78 @@ async function closeMaintenanceEvent(id) {
     );
   }
 
+async function saveFlightLog() {
+  if (!selectedAircraft?.id) {
+    alert("No aircraft selected.");
+    return;
+  }
+
+  if (!flightForm.flight_date) {
+    alert("Flight date is required.");
+    return;
+  }
+
+  setSavingFlight(true);
+
+  const hobbsOut = flightForm.hobbs_out ? Number(flightForm.hobbs_out) : null;
+  const hobbsIn = flightForm.hobbs_in ? Number(flightForm.hobbs_in) : null;
+  const tachOut = flightForm.tach_out ? Number(flightForm.tach_out) : null;
+  const tachIn = flightForm.tach_in ? Number(flightForm.tach_in) : null;
+
+  const calculatedFlightTime =
+    hobbsOut !== null && hobbsIn !== null
+      ? hobbsIn - hobbsOut
+      : tachOut !== null && tachIn !== null
+      ? tachIn - tachOut
+      : flightForm.flight_time
+      ? Number(flightForm.flight_time)
+      : null;
+
+  const { error } = await supabase.from("flight_logs").insert([
+    {
+      aircraft_id: selectedAircraft.id,
+      pilot: flightForm.pilot || null,
+      copilot: flightForm.copilot || null,
+      flight_date: flightForm.flight_date,
+      departure: flightForm.departure || null,
+      destination: flightForm.destination || null,
+      hobbs_out: hobbsOut,
+      hobbs_in: hobbsIn,
+      tach_out: tachOut,
+      tach_in: tachIn,
+      flight_time: calculatedFlightTime,
+      landings: flightForm.landings ? Number(flightForm.landings) : 0,
+      notes: flightForm.notes || null,
+    },
+  ]);
+
+  setSavingFlight(false);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setFlightForm({
+    pilot: "",
+    copilot: "",
+    flight_date: "",
+    departure: "",
+    destination: "",
+    hobbs_out: "",
+    hobbs_in: "",
+    tach_out: "",
+    tach_in: "",
+    flight_time: "",
+    landings: "",
+    notes: "",
+  });
+
+  setShowFlightForm(false);
+  loadFlightLogs(selectedAircraft.id);
+}
+  
+
   if (!session) {
   return (
     <div className="app-shell">
@@ -851,6 +960,173 @@ async function closeMaintenanceEvent(id) {
                   </div>
                 )}
               </section>
+
+              <section className="card">
+  <div className="section-header-row">
+    <div>
+      <h2 className="section-title">Flight Log</h2>
+      <p className="section-text">
+        Recent sorties, flight hours, landings, and crew tracking.
+      </p>
+    </div>
+
+    <button
+      className="small-button"
+      onClick={() => setShowFlightForm(!showFlightForm)}
+    >
+      {showFlightForm ? "Close" : "+ Add Flight"}
+    </button>
+  </div>
+
+  {showFlightForm && (
+    <div className="flight-form-grid">
+      <input
+        className="input"
+        placeholder="Pilot"
+        value={flightForm.pilot}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, pilot: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Co-Pilot"
+        value={flightForm.copilot}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, copilot: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        type="date"
+        value={flightForm.flight_date}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, flight_date: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Departure"
+        value={flightForm.departure}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, departure: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Destination"
+        value={flightForm.destination}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, destination: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Hobbs Out"
+        value={flightForm.hobbs_out}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, hobbs_out: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Hobbs In"
+        value={flightForm.hobbs_in}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, hobbs_in: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Tach Out"
+        value={flightForm.tach_out}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, tach_out: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Tach In"
+        value={flightForm.tach_in}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, tach_in: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Flight Hours"
+        value={flightForm.flight_time}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, flight_time: e.target.value })
+        }
+      />
+
+      <input
+        className="input"
+        placeholder="Landings"
+        value={flightForm.landings}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, landings: e.target.value })
+        }
+      />
+
+      <textarea
+        className="input"
+        placeholder="Notes"
+        value={flightForm.notes}
+        onChange={(e) =>
+          setFlightForm({ ...flightForm, notes: e.target.value })
+        }
+      />
+
+      <button
+        className="primary-button"
+        onClick={saveFlightLog}
+        disabled={savingFlight}
+      >
+        {savingFlight ? "Saving..." : "Save Flight"}
+      </button>
+    </div>
+  )}
+
+  {flightLogs.length === 0 ? (
+    <div className="empty-small">
+      No flight logs recorded yet.
+    </div>
+  ) : (
+    <div className="status-list">
+      {flightLogs.slice(0, 3).map((flight) => (
+        <div className="status-item" key={flight.id}>
+          <div className="status-item-body">
+            <div className="status-item-title">
+              {flight.departure || "---"} →{" "}
+              {flight.destination || "---"}
+            </div>
+
+            <div className="status-item-meta">
+              {flight.flight_date} · Pilot:{" "}
+              {flight.pilot || "Unknown"}
+            </div>
+
+            <div className="status-item-description">
+              Flight Time: {flight.flight_time || 0} hrs ·
+              Landings: {flight.landings || 0}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
                 {canAddDiscrepancy() && (
             <section className="card">
