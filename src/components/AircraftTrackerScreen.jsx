@@ -6,7 +6,7 @@ export default function AircraftTrackerScreen() {
   const [aircraft, setAircraft] = useState([]);
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [authEmail, setAuthEmail] = useState("");F
+  const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [company, setCompany] = useState(null);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
