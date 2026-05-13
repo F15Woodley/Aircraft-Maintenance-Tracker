@@ -16,6 +16,7 @@ export default function AircraftTrackerScreen() {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [showDiscrepancyForm, setShowDiscrepancyForm] = useState(false);
   const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
+  const [showAircraftForm, setShowAircraftForm] = useState(false);
   const [flightLogs, setFlightLogs] = useState([]);
   const [showFlightForm, setShowFlightForm] = useState(false);
   const [savingFlight, setSavingFlight] = useState(false);
@@ -244,6 +245,16 @@ useEffect(() => {
   setDocuments(data || []);
 }
 
+
+
+function openAircraftDashboard(plane) {
+  setSelectedAircraft(plane);
+  loadDiscrepancies(plane.id);
+  loadMaintenanceEvents(plane.id);
+  loadDocuments(plane.id);
+  loadFlightLogs(plane.id)
+}
+
   async function addAircraft() {
     if (!company?.id) {
       alert("Company is still loading. Try again in a moment.");
@@ -275,16 +286,9 @@ useEffect(() => {
     });
 
     loadAircraft(company.id);
+    setShowAircraftForm(false);
   }
-
-function openAircraftDashboard(plane) {
-  setSelectedAircraft(plane);
-  loadDiscrepancies(plane.id);
-  loadMaintenanceEvents(plane.id);
-  loadDocuments(plane.id);
-  loadFlightLogs(plane.id)
-}
-
+  
   async function addDiscrepancy() {
     if (!selectedAircraft || !company) return;
 
@@ -765,83 +769,82 @@ async function saveFlightLog() {
                   <div className="stat-number green">{aircraft.length}</div>
                   <div className="stat-label">Currently Active</div>
                 </div>
-              </section>
+      <section className="fleet-section">
+  <h2 className="section-title">Fleet</h2>
+  <p className="section-text">
+    Select an aircraft to open its operational dashboard.
+  </p>
 
-              <section className="card">
-                <h2 className="section-title">Add Aircraft</h2>
-                <p className="section-text">
-                  Create a new aircraft record for this company.
-                </p>
+  {aircraft.length === 0 ? (
+    <div className="card empty-state">No aircraft added yet.</div>
+  ) : (
+    <div className="aircraft-row">
+      {aircraft.map((plane) => (
+        <div className="card aircraft-card" key={plane.id}>
+          <div>
+            <div className="aircraft-title">{plane.tail_number}</div>
+            <div className="aircraft-subtitle">
+              {plane.make} {plane.model}
+            </div>
+          </div>
 
-                <div className="form-grid">
-                  <input className="input" placeholder="Tail Number" value={form.tail_number} onChange={(e) => setForm({ ...form, tail_number: e.target.value })} />
-                  <input className="input" placeholder="Make" value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} />
-                  <input className="input" placeholder="Model" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
-                  <input className="input" placeholder="Current Tach" value={form.current_tach} onChange={(e) => setForm({ ...form, current_tach: e.target.value })} />
-                  <input className="input" placeholder="Total Time" value={form.total_time} onChange={(e) => setForm({ ...form, total_time: e.target.value })} />
-                  <input className="input" placeholder="FlightAware URL" value={form.flightaware_url} onChange={(e) => setForm({ ...form, flightaware_url: e.target.value })} />
-                </div>
+          <div className="metrics">
+            <div>
+              <div className="metric-label">Current Tach</div>
+              <div className="metric-value">{plane.current_tach || 0}</div>
+            </div>
+            <div>
+              <div className="metric-label">Total Time</div>
+              <div className="metric-value">{plane.total_time || 0}</div>
+            </div>
+          </div>
 
-                <button className="primary-button" onClick={addAircraft}>
-                  Add Aircraft
-                </button>
-              </section>
+          <button
+            className="link-button"
+            onClick={() => openAircraftDashboard(plane)}
+          >
+            Open Dashboard
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
-              <section className="fleet-section">
-                <h2 className="section-title">Fleet</h2>
-                <p className="section-text">
-                  Select an aircraft to open its operational dashboard.
-                </p>
+<section className="card">
+  <div className="section-header-row">
+    <div>
+      <h2 className="section-title">Aircraft Management</h2>
+      <p className="section-text">
+        Add aircraft only when onboarding a new fleet asset.
+      </p>
+    </div>
 
-                {aircraft.length === 0 ? (
-                  <div className="card empty-state">No aircraft added yet.</div>
-                ) : (
-                  <div className="aircraft-row">
-                    {aircraft.map((plane) => (
-                      <div className="card aircraft-card" key={plane.id}>
-                        <div>
-                          <div className="aircraft-title">{plane.tail_number}</div>
-                          <div className="aircraft-subtitle">
-                            {plane.make} {plane.model}
-                          </div>
-                        </div>
+    <button
+      className="secondary-button"
+      onClick={() => setShowAircraftForm(!showAircraftForm)}
+    >
+      {showAircraftForm ? "Cancel" : "＋ Add Aircraft"}
+    </button>
+  </div>
 
-                        <div className="metrics">
-                          <div>
-                            <div className="metric-label">Current Tach</div>
-                            <div className="metric-value">{plane.current_tach || 0}</div>
-                          </div>
-                          <div>
-                            <div className="metric-label">Total Time</div>
-                            <div className="metric-value">{plane.total_time || 0}</div>
-                          </div>
-                        </div>
+  {showAircraftForm && (
+    <div className="collapsible-form">
+      <div className="form-grid">
+        <input className="input" placeholder="Tail Number" value={form.tail_number} onChange={(e) => setForm({ ...form, tail_number: e.target.value })} />
+        <input className="input" placeholder="Make" value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} />
+        <input className="input" placeholder="Model" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
+        <input className="input" placeholder="Current Tach" value={form.current_tach} onChange={(e) => setForm({ ...form, current_tach: e.target.value })} />
+        <input className="input" placeholder="Total Time" value={form.total_time} onChange={(e) => setForm({ ...form, total_time: e.target.value })} />
+        <input className="input" placeholder="FlightAware URL" value={form.flightaware_url} onChange={(e) => setForm({ ...form, flightaware_url: e.target.value })} />
+      </div>
 
-                        <button
-                          className="link-button"
-                          onClick={() => openAircraftDashboard(plane)}
-                        >
-                          Open Dashboard
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-            </>
-          ) : (
-            <>
-              <button
-                className="back-button"
-                onClick={() => {
-                  setSelectedAircraft(null);
-                  setDiscrepancies([]);
-                  setMaintenanceEvents([]);
-                }}
-              >
-                ← Back to Fleet
-              </button>
-
+      <button className="primary-button" onClick={addAircraft}>
+        Add Aircraft
+      </button>
+    </div>
+  )}
+</section>
               <section className="hero-grid">
                 <div className="card">
                   <div className="eyebrow">AIRCRAFT DASHBOARD</div>
