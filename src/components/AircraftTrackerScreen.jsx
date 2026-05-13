@@ -1126,7 +1126,7 @@ async function saveFlightLog() {
   </button>
 
   <button
-    className="secondary-button"
+    className="secondary-button flight-discrepancy-button"
     type="button"
     onClick={() => setAddFlightDiscrepancy(!addFlightDiscrepancy)}
   >
