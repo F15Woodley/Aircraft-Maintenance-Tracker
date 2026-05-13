@@ -279,7 +279,7 @@ body {
   grid-template-columns: 70px 120px 1.4fr 1.2fr 1fr 1fr 90px 90px;
   gap: 12px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 10px 14px;
 }
 
 .flight-log-header {
@@ -295,6 +295,10 @@ body {
   font-size: 13px;
   color: #e5e7eb;
   border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.flight-log-row:hover {
+  background: rgba(59, 130, 246, 0.08);
 }
 
 .flight-log-row:last-child {
