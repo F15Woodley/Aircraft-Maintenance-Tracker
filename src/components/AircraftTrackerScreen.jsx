@@ -22,6 +22,15 @@ export default function AircraftTrackerScreen() {
   const [savingFlight, setSavingFlight] = useState(false);
   const [selectedFlightLog, setSelectedFlightLog] = useState(null);
   const [showFlightDetails, setShowFlightDetails] = useState(false);
+  const [addFlightDiscrepancy, setAddFlightDiscrepancy] = useState(false);
+
+  const [flightDiscrepancyForm, setFlightDiscrepancyForm] = useState({
+    title: "",
+    description: "",
+    category: "other",
+    severity: "yellow",
+    is_grounding: false,
+  });
   
   const [flightForm, setFlightForm] = useState({
     pilot: "",
@@ -1107,16 +1116,90 @@ async function saveFlightLog() {
         }
       />
 
-      <button
-        className="primary-button"
-        onClick={saveFlightLog}
-        disabled={savingFlight}
-      >
-        {savingFlight ? "Saving..." : "Save Flight"}
-      </button>
+<div className="flight-form-actions">
+  <button
+    className="primary-button"
+    onClick={saveFlightLog}
+    disabled={savingFlight}
+  >
+    {savingFlight ? "Saving..." : "Save Flight"}
+  </button>
+
+  <button
+    className="secondary-button"
+    type="button"
+    onClick={() => setAddFlightDiscrepancy(!addFlightDiscrepancy)}
+  >
+    {addFlightDiscrepancy ? "Remove Discrepancy" : "+ Add Discrepancy to Flight"}
+  </button>
+</div>
     </div>
   )}
 
+{addFlightDiscrepancy && (
+  <div className="collapsible-form">
+    <div className="form-grid">
+      <input
+        className="input"
+        placeholder="Discrepancy Title"
+        value={flightDiscrepancyForm.title}
+        onChange={(e) =>
+          setFlightDiscrepancyForm({
+            ...flightDiscrepancyForm,
+            title: e.target.value,
+          })
+        }
+      />
+
+      <select
+        className="input"
+        value={flightDiscrepancyForm.category}
+        onChange={(e) =>
+          setFlightDiscrepancyForm({
+            ...flightDiscrepancyForm,
+            category: e.target.value,
+          })
+        }
+      >
+        <option value="airframe">Airframe</option>
+        <option value="avionics">Avionics</option>
+        <option value="electrical">Electrical</option>
+        <option value="engine">Engine</option>
+        <option value="propeller">Propeller</option>
+        <option value="landing_gear">Landing Gear</option>
+        <option value="fuel">Fuel System</option>
+        <option value="other">Other</option>
+      </select>
+
+      <select
+        className="input"
+        value={flightDiscrepancyForm.severity}
+        onChange={(e) =>
+          setFlightDiscrepancyForm({
+            ...flightDiscrepancyForm,
+            severity: e.target.value,
+          })
+        }
+      >
+        <option value="yellow">Yellow — Non-grounding</option>
+        <option value="red">Red — Grounding / Do Not Fly</option>
+      </select>
+    </div>
+
+    <textarea
+      className="input textarea"
+      placeholder="Describe discrepancy from this flight..."
+      value={flightDiscrepancyForm.description}
+      onChange={(e) =>
+        setFlightDiscrepancyForm({
+          ...flightDiscrepancyForm,
+          description: e.target.value,
+        })
+      }
+    />
+  </div>
+)}
+                
   {flightLogs.length === 0 ? (
     <div className="empty-small">
       No flight logs recorded yet.
