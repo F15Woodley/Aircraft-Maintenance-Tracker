@@ -694,3 +694,17 @@ body {
   color: #94a3b8;
   font-size: 13px;
 }
+
+.flight-form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 18px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.flight-form-actions .primary-button,
+.flight-form-actions .secondary-button {
+  width: auto;
+}
