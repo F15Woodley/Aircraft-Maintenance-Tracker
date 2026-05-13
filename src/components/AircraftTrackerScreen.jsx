@@ -1561,18 +1561,20 @@ async function saveFlightLog() {
       <div className="modal-actions">
         <button
           className="primary-button"
-          onClick={() => {
-            setShowFlightDetails(false);
-            setShowDiscrepancyForm(true);
-            setDiscrepancyForm({
-              title: "",
-              description: "",
-              category: "other",
-              severity: "yellow",
-              is_grounding: false,
-              flight_log_id: selectedFlightLog.id,
-            });
-          }}
+         onClick={() => {
+  alert("Flight-linked discrepancy creation coming next.");
+
+  setDiscrepancyForm({
+    title: "",
+    description: "",
+    category: "other",
+    severity: "yellow",
+    is_grounding: false,
+    flight_log_id: selectedFlightLog.id,
+  });
+
+  setShowFlightDetails(false);
+}}
         >
           + Add Discrepancy to This Flight
         </button>
