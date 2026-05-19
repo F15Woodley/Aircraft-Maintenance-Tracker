@@ -1330,12 +1330,15 @@ async function saveFlightLog() {
 
   {flightLogs.slice(0, 3).map((flight) => (
         <div
+<div
   className="flight-log-row clickable-row"
   key={flight.id}
+  role="button"
+  tabIndex={0}
   onClick={() => {
-  setSelectedFlightLog(flight);
-  setShowFlightDetails(true);
-}}
+    setSelectedFlightLog(flight);
+    setShowFlightDetails(true);
+  }}
 >
       <div>
         <span
@@ -1703,6 +1706,13 @@ async function saveFlightLog() {
 </section>
             </>
           )}
+
+{showFlightDetails && (
+  <div style={{ color: "red", fontSize: "24px", padding: "20px" }}>
+    MODAL STATE TRUE
+  </div>
+)}
+          
 {showFlightDetails && selectedFlightLog && (
   <div className="modal-backdrop">
     <div className="modal-card">
