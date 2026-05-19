@@ -1765,6 +1765,12 @@ async function saveFlightLog() {
       </div>
 
       <div className="modal-actions">
+ <button
+    className="secondary-button"
+    onClick={() => startEditFlight(selectedFlightLog)}
+  >
+    Edit Flight
+  </button>
         <button
           className="primary-button"
          onClick={() => {
