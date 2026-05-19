@@ -1330,7 +1330,6 @@ async function saveFlightLog() {
 
   {flightLogs.slice(0, 3).map((flight) => (
         <div
-<div
   className="flight-log-row clickable-row"
   key={flight.id}
   role="button"
