@@ -24,6 +24,7 @@ export default function AircraftTrackerScreen() {
   const [editingFlightId, setEditingFlightId] = useState(null);
   const [showFlightDetails, setShowFlightDetails] = useState(false);
   const [addFlightDiscrepancy, setAddFlightDiscrepancy] = useState(false);
+  const [aircraftToDelete, setAircraftToDelete] = useState("");
 
   const [flightDiscrepancyForm, setFlightDiscrepancyForm] = useState({
     title: "",
@@ -355,6 +356,34 @@ function openAircraftDashboard(plane) {
     loadAircraft(company.id);
     setShowAircraftForm(false);
   }
+
+ async function deleteAircraft() {
+  if (!aircraftToDelete) {
+    alert("Select an aircraft to delete.");
+    return;
+  }
+
+  const plane = aircraft.find((item) => item.id === aircraftToDelete);
+
+  const confirmed = window.confirm(
+    `Delete ${plane?.tail_number || "this aircraft"}?\n\nThis will permanently delete the aircraft and related records.`
+  );
+
+  if (!confirmed) return;
+
+  const { error } = await supabase
+    .from("aircraft")
+    .delete()
+    .eq("id", aircraftToDelete);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setAircraftToDelete("");
+  loadAircraft(company.id);
+} 
   
   async function addDiscrepancy() {
     if (!selectedAircraft || !company) return;
@@ -955,6 +984,31 @@ async function saveFlightLog() {
       </button>
     </div>
   )}
+
+<div className="danger-zone">
+  <h3>Delete Aircraft</h3>
+  <p>Select an aircraft to permanently remove it from the fleet.</p>
+
+  <div className="form-grid">
+    <select
+      className="input"
+      value={aircraftToDelete}
+      onChange={(e) => setAircraftToDelete(e.target.value)}
+    >
+      <option value="">Select aircraft...</option>
+      {aircraft.map((plane) => (
+        <option key={plane.id} value={plane.id}>
+          {plane.tail_number} — {plane.make} {plane.model}
+        </option>
+      ))}
+    </select>
+
+    <button className="danger-button" onClick={deleteAircraft}>
+      Delete Aircraft
+    </button>
+  </div>
+</div>
+  
 </section>
             </>
           ) : (
