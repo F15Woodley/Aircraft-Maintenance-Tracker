@@ -318,6 +318,17 @@ body {
   border-bottom: none;
 }
 
+.flight-log-row,
+.flight-log-row * {
+  pointer-events: auto;
+}
+
+.flight-log-row .small-button {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
 .flight-status-dot {
   width: 12px;
   height: 12px;
