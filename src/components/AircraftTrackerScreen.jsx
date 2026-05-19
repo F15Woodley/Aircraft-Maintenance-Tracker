@@ -1065,12 +1065,25 @@ async function saveFlightLog() {
       </p>
     </div>
 
-    <button
-      className="small-button"
-      onClick={() => setShowFlightForm(!showFlightForm)}
-    >
-      {showFlightForm ? "Close" : "+ Add Flight"}
-    </button>
+<button
+  className="small-button"
+  onClick={() => {
+    const latestFlight = flightLogs[0];
+
+    if (!showFlightForm && latestFlight) {
+      setFlightForm((prev) => ({
+        ...prev,
+        hobbs_out: latestFlight.hobbs_in || "",
+        tach_out: latestFlight.tach_in || "",
+        departure: latestFlight.destination || "",
+      }));
+    }
+
+    setShowFlightForm(!showFlightForm);
+  }}
+>
+  {showFlightForm ? "Close" : "+ Add Flight"}
+</button>
   </div>
 
   {showFlightForm && (
