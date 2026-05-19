@@ -1326,6 +1326,7 @@ async function saveFlightLog() {
     <div>Tach</div>
     <div>Time</div>
     <div>Landings</div>
+    <div>Actions</div>
   </div>
 
   {flightLogs.slice(0, 3).map((flight) => (
@@ -1374,6 +1375,20 @@ async function saveFlightLog() {
       <div>{flight.flight_time || "—"} hrs</div>
 
       <div>{flight.landings || 0}</div>
+<div>
+  <button
+    className="small-button"
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation();
+      setSelectedFlightLog(flight);
+      setShowFlightDetails(true);
+    }}
+  >
+    Details
+  </button>
+</div>
+          
     </div>
   ))}
 </div>
