@@ -1332,7 +1332,10 @@ async function saveFlightLog() {
         <div
   className="flight-log-row clickable-row"
   key={flight.id}
-  onClick={() => openFlightDetails(flight)}
+  onClick={() => {
+  setSelectedFlightLog(flight);
+  setShowFlightDetails(true);
+}}
 >
       <div>
         <span
