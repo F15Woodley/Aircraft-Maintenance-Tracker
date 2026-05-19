@@ -1330,10 +1330,13 @@ async function saveFlightLog() {
 
   {flightLogs.slice(0, 3).map((flight) => (
         <div
-      className="flight-log-row clickable-row"
-      key={flight.id}
-      onClick={() => openFlightDetails(flight)}
-    >
+  className="flight-log-row clickable-row"
+  key={flight.id}
+  onClick={() => {
+    alert("Flight row clicked");
+    openFlightDetails(flight);
+  }}
+>
       <div>
         <span
   className={`flight-status-dot ${getFlightStatusColor(flight)}`}
