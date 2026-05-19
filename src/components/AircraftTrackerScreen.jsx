@@ -1329,17 +1329,11 @@ async function saveFlightLog() {
     <div>Actions</div>
   </div>
 
-  {flightLogs.slice(0, 3).map((flight) => (
-        <div
-  className="flight-log-row clickable-row"
-  key={flight.id}
-  role="button"
-  tabIndex={0}
-  onClick={() => {
-    setSelectedFlightLog(flight);
-    setShowFlightDetails(true);
-  }}
->
+{flightLogs.slice(0, 3).map((flight) => (
+  <div
+    className="flight-log-row"
+    key={flight.id}
+  >
       <div>
         <span
   className={`flight-status-dot ${getFlightStatusColor(flight)}`}
@@ -1376,17 +1370,19 @@ async function saveFlightLog() {
 
       <div>{flight.landings || 0}</div>
 <div>
-  <button
-    className="small-button"
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation();
-      setSelectedFlightLog(flight);
-      setShowFlightDetails(true);
-    }}
-  >
-    Details
-  </button>
+<button
+  type="button"
+  className="small-button"
+  onMouseDown={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    alert("Details clicked");
+    setSelectedFlightLog(flight);
+    setShowFlightDetails(true);
+  }}
+>
+  Details
+</button>
 </div>
           
     </div>
