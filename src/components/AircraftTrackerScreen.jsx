@@ -21,6 +21,7 @@ export default function AircraftTrackerScreen() {
   const [showFlightForm, setShowFlightForm] = useState(false);
   const [savingFlight, setSavingFlight] = useState(false);
   const [selectedFlightLog, setSelectedFlightLog] = useState(null);
+  const [editingFlightId, setEditingFlightId] = useState(null);
   const [showFlightDetails, setShowFlightDetails] = useState(false);
   const [addFlightDiscrepancy, setAddFlightDiscrepancy] = useState(false);
 
@@ -199,9 +200,31 @@ function canUploadDocuments() {
   return isAdmin() || isMaintenance() || isPilot();
 }
 
-  function openFlightDetails(flight) {
+function openFlightDetails(flight) {
   setSelectedFlightLog(flight);
+  setEditingFlightId(null);
   setShowFlightDetails(true);
+}
+
+  function startEditFlight(flight) {
+  setFlightForm({
+    pilot: flight.pilot || "",
+    copilot: flight.copilot || "",
+    flight_date: flight.flight_date || "",
+    departure: flight.departure || "",
+    destination: flight.destination || "",
+    hobbs_out: flight.hobbs_out || "",
+    hobbs_in: flight.hobbs_in || "",
+    tach_out: flight.tach_out || "",
+    tach_in: flight.tach_in || "",
+    flight_time: flight.flight_time || "",
+    landings: flight.landings || "",
+    notes: flight.notes || "",
+  });
+
+  setEditingFlightId(flight.id);
+  setShowFlightDetails(false);
+  setShowFlightForm(true);
 }
   
   function getFlightStatusColor(flight) {
