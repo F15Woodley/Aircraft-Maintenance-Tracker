@@ -1053,6 +1053,31 @@ async function saveFlightLog() {
     </div>
   )}
 
+  {editingAircraftId && (
+  <div className="collapsible-form">
+    <h3>Edit Aircraft</h3>
+
+    <div className="form-grid">
+      <input className="input" placeholder="Tail Number" value={editAircraftForm.tail_number} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, tail_number: e.target.value })} />
+      <input className="input" placeholder="Make" value={editAircraftForm.make} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, make: e.target.value })} />
+      <input className="input" placeholder="Model" value={editAircraftForm.model} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, model: e.target.value })} />
+      <input className="input" placeholder="Current Tach" value={editAircraftForm.current_tach} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, current_tach: e.target.value })} />
+      <input className="input" placeholder="Total Time" value={editAircraftForm.total_time} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, total_time: e.target.value })} />
+      <input className="input" placeholder="FlightAware URL" value={editAircraftForm.flightaware_url} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, flightaware_url: e.target.value })} />
+    </div>
+
+    <div className="flight-form-actions">
+      <button className="primary-button" onClick={updateAircraft}>
+        Save Aircraft Changes
+      </button>
+
+      <button className="secondary-button" onClick={cancelEditAircraft}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
 <div className="danger-zone">
   <h3>Delete Aircraft</h3>
   <p>Select an aircraft to permanently remove it from the fleet.</p>
