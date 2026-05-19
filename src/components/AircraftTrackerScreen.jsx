@@ -81,6 +81,17 @@ export default function AircraftTrackerScreen() {
     notes: "",
   });
 
+ const [editingAircraftId, setEditingAircraftId] = useState(null);
+
+const [editAircraftForm, setEditAircraftForm] = useState({
+  tail_number: "",
+  make: "",
+  model: "",
+  current_tach: "",
+  total_time: "",
+  flightaware_url: "",
+}); 
+
 async function loadSession() {
   const { data } = await supabase.auth.getSession();
 
@@ -321,6 +332,56 @@ function openAircraftDashboard(plane) {
   loadMaintenanceEvents(plane.id);
   loadDocuments(plane.id);
   loadFlightLogs(plane.id)
+}
+
+  function startEditAircraft(plane) {
+  setEditingAircraftId(plane.id);
+
+  setEditAircraftForm({
+    tail_number: plane.tail_number || "",
+    make: plane.make || "",
+    model: plane.model || "",
+    current_tach: plane.current_tach || "",
+    total_time: plane.total_time || "",
+    flightaware_url: plane.flightaware_url || "",
+  });
+}
+
+function cancelEditAircraft() {
+  setEditingAircraftId(null);
+
+  setEditAircraftForm({
+    tail_number: "",
+    make: "",
+    model: "",
+    current_tach: "",
+    total_time: "",
+    flightaware_url: "",
+  });
+}
+
+async function updateAircraft() {
+  if (!editingAircraftId) return;
+
+  const { error } = await supabase
+    .from("aircraft")
+    .update({
+      tail_number: editAircraftForm.tail_number.trim().toUpperCase(),
+      make: editAircraftForm.make.trim(),
+      model: editAircraftForm.model.trim(),
+      current_tach: Number(editAircraftForm.current_tach || 0),
+      total_time: Number(editAircraftForm.total_time || 0),
+      flightaware_url: editAircraftForm.flightaware_url.trim(),
+    })
+    .eq("id", editingAircraftId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  cancelEditAircraft();
+  loadAircraft(company.id);
 }
 
   async function addAircraft() {
@@ -940,6 +1001,13 @@ async function saveFlightLog() {
           </div>
 
           <button
+            className="small-button edit-button"
+            onClick={() => startEditAircraft(plane)}
+          >
+            Edit
+          </button>
+
+          <button
             className="link-button"
             onClick={() => openAircraftDashboard(plane)}
           >
@@ -1002,6 +1070,13 @@ async function saveFlightLog() {
         </option>
       ))}
     </select>
+
+            <button
+          className="small-button edit-button"
+          onClick={() => startEditAircraft(plane)}
+        >
+          Edit
+        </button>
 
     <button className="danger-button" onClick={deleteAircraft}>
       Delete Aircraft
