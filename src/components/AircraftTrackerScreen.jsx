@@ -1376,7 +1376,6 @@ async function saveFlightLog() {
   onMouseDown={(e) => {
     e.preventDefault();
     e.stopPropagation();
-    alert("Details clicked");
     setSelectedFlightLog(flight);
     setShowFlightDetails(true);
   }}
@@ -1717,11 +1716,6 @@ async function saveFlightLog() {
             </>
           )}
 
-{showFlightDetails && (
-  <div style={{ color: "red", fontSize: "24px", padding: "20px" }}>
-    MODAL STATE TRUE
-  </div>
-)}
           
 {showFlightDetails && selectedFlightLog && (
   <div className="modal-backdrop">
