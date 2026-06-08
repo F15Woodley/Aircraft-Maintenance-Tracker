@@ -73,6 +73,8 @@ export default function AircraftTrackerScreen() {
   const [maintenanceForm, setMaintenanceForm] = useState({
     item_name: "",
     category: "maintenance",
+    component: "airframe",
+    item_type: "inspection",
     interval_type: "hours",
     last_completed_date: "",
     last_completed_tach: "",
