@@ -574,6 +574,8 @@ const { error } = await supabase.from("aircraft_discrepancies").insert({
       company_id: company.id,
       aircraft_id: selectedAircraft.id,
       item_name: maintenanceForm.item_name.trim(),
+      component: maintenanceForm.component,
+      item_type: maintenanceForm.item_type,
       category: maintenanceForm.category,
       interval_type: maintenanceForm.interval_type,
       last_completed_date: maintenanceForm.last_completed_date || null,
@@ -1816,6 +1818,42 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
               })
             }
           />
+
+<select
+  className="input"
+  value={maintenanceForm.component}
+  onChange={(e) =>
+    setMaintenanceForm({
+      ...maintenanceForm,
+      component: e.target.value,
+    })
+  }
+>
+  <option value="airframe">Airframe</option>
+  <option value="left_engine">Left Engine</option>
+  <option value="right_engine">Right Engine</option>
+  <option value="left_prop">Left Propeller</option>
+  <option value="right_prop">Right Propeller</option>
+  <option value="avionics">Avionics</option>
+  <option value="other">Other</option>
+</select>
+
+<select
+  className="input"
+  value={maintenanceForm.item_type}
+  onChange={(e) =>
+    setMaintenanceForm({
+      ...maintenanceForm,
+      item_type: e.target.value,
+    })
+  }
+>
+  <option value="inspection">Inspection</option>
+  <option value="service">Service</option>
+  <option value="replacement">Replacement</option>
+  <option value="overhaul">Overhaul</option>
+  <option value="compliance">Compliance</option>
+</select>
 
           <select
             className="input"
