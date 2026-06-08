@@ -1267,10 +1267,14 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
 
           <button
             className="link-button"
-            onClick={() => {
-              setActiveView("fleet");
-              openAircraftDashboard(plane);
-            }}
+onClick={() => {
+  setSelectedAircraft(plane);
+  setActiveView("maintenance-detail");
+
+  loadDiscrepancies(plane.id);
+  loadMaintenanceEvents(plane.id);
+  loadDocuments(plane.id);
+}}
           >
             Open Maintenance Dashboard
           </button>
@@ -1279,6 +1283,50 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
     </div>
   </section>
 )}
+
+             {activeView === "maintenance-detail" && selectedAircraft && (
+  <section className="card">
+    <button
+      className="back-button"
+      onClick={() => {
+        setSelectedAircraft(null);
+        setActiveView("maintenance");
+      }}
+    >
+      ← Back to Maintenance Center
+    </button>
+
+    <h2 className="section-title">
+      Maintenance Dashboard — {selectedAircraft.tail_number}
+    </h2>
+
+    <p className="section-text">
+      Airframe, engine, propeller, inspection, discrepancy, and compliance tracking.
+    </p>
+
+    <div className="metrics dashboard-metrics">
+      <div>
+        <div className="metric-label">Current Tach</div>
+        <div className="metric-value">{selectedAircraft.current_tach || 0}</div>
+      </div>
+
+      <div>
+        <div className="metric-label">Airframe Total Time</div>
+        <div className="metric-value">{selectedAircraft.total_time || 0}</div>
+      </div>
+
+      <div>
+        <div className="metric-label">Open Discrepancies</div>
+        <div className="metric-value">{discrepancies.length}</div>
+      </div>
+
+      <div>
+        <div className="metric-label">Open Maintenance Items</div>
+        <div className="metric-value">{maintenanceEvents.length}</div>
+      </div>
+    </div>
+  </section>
+)} 
               
             </>
           ) : (
