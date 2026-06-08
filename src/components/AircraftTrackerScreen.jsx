@@ -1062,12 +1062,19 @@ if (updatedTach !== null) {
     <div className="aircraft-row">
       {aircraft.map((plane) => (
         <div className="card aircraft-card" key={plane.id}>
-          <div>
-            <div className="aircraft-title">{plane.tail_number}</div>
-            <div className="aircraft-subtitle">
-              {plane.make} {plane.model}
-            </div>
-          </div>
+<div>
+  <div className="aircraft-title-row">
+    <div className="aircraft-title">{plane.tail_number}</div>
+
+    <span className={`fleet-status-badge ${fleetStatusMap[plane.id]?.color || "green"}`}>
+      {fleetStatusMap[plane.id]?.label || "GREEN"}
+    </span>
+  </div>
+
+  <div className="aircraft-subtitle">
+    {plane.make} {plane.model}
+  </div>
+</div>
 
           <div className="metrics">
             <div>
