@@ -1230,6 +1230,52 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
 </section>
       </>
 )}
+
+{activeView === "maintenance" && (
+  <section className="card">
+    <h2 className="section-title">Maintenance Center</h2>
+    <p className="section-text">
+      Select an aircraft to view inspections, maintenance events, discrepancies,
+      and compliance items.
+    </p>
+
+    <div className="aircraft-row">
+      {aircraft.map((plane) => (
+        <div className="card aircraft-card" key={plane.id}>
+          <div>
+            <div className="aircraft-title">{plane.tail_number}</div>
+            <div className="aircraft-subtitle">
+              {plane.make} {plane.model}
+            </div>
+          </div>
+
+          <div className="metrics">
+            <div>
+              <div className="metric-label">Current Tach</div>
+              <div className="metric-value">{plane.current_tach || 0}</div>
+            </div>
+
+            <div>
+              <div className="metric-label">Total Time</div>
+              <div className="metric-value">{plane.total_time || 0}</div>
+            </div>
+          </div>
+
+          <button
+            className="link-button"
+            onClick={() => {
+              setActiveView("fleet");
+              openAircraftDashboard(plane);
+            }}
+          >
+            Open Maintenance Dashboard
+          </button>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+              
             </>
           ) : (
             <>
