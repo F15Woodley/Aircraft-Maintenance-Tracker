@@ -25,6 +25,7 @@ export default function AircraftTrackerScreen() {
   const [showFlightDetails, setShowFlightDetails] = useState(false);
   const [addFlightDiscrepancy, setAddFlightDiscrepancy] = useState(false);
   const [aircraftToDelete, setAircraftToDelete] = useState("");
+  const [fleetStatusMap, setFleetStatusMap] = useState({});
 
   const [flightDiscrepancyForm, setFlightDiscrepancyForm] = useState({
     title: "",
@@ -271,8 +272,54 @@ function openFlightDetails(flight) {
     }
 
     setAircraft(data || []);
+    loadFleetStatuses(data || []);
   }
 
+async function loadFleetStatuses(aircraftList) {
+  if (!aircraftList?.length) {
+    setFleetStatusMap({});
+    return;
+  }
+
+  const aircraftIds = aircraftList.map((plane) => plane.id);
+
+  const { data: openDiscrepancies } = await supabase
+    .from("aircraft_discrepancies")
+    .select("aircraft_id, severity, is_grounding, status")
+    .in("aircraft_id", aircraftIds)
+    .eq("status", "open");
+
+  const statusMap = {};
+
+  aircraftList.forEach((plane) => {
+    const planeDiscrepancies =
+      openDiscrepancies?.filter((item) => item.aircraft_id === plane.id) || [];
+
+    if (
+      planeDiscrepancies.some(
+        (item) => item.is_grounding || item.severity === "red"
+      )
+    ) {
+      statusMap[plane.id] = {
+        color: "red",
+        label: "RED",
+      };
+    } else if (planeDiscrepancies.length > 0) {
+      statusMap[plane.id] = {
+        color: "yellow",
+        label: "YELLOW",
+      };
+    } else {
+      statusMap[plane.id] = {
+        color: "green",
+        label: "GREEN",
+      };
+    }
+  });
+
+  setFleetStatusMap(statusMap);
+}
+  
   async function loadDiscrepancies(aircraftId) {
     const { data, error } = await supabase
       .from("aircraft_discrepancies")
