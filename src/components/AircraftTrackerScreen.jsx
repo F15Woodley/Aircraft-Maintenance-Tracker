@@ -1304,27 +1304,41 @@ onClick={() => {
       Airframe, engine, propeller, inspection, discrepancy, and compliance tracking.
     </p>
 
-    <div className="metrics dashboard-metrics">
-      <div>
-        <div className="metric-label">Current Tach</div>
-        <div className="metric-value">{selectedAircraft.current_tach || 0}</div>
-      </div>
+<div className="maintenance-summary-grid">
+  <div className="summary-tile">
+    <div className="metric-label">Current Tach</div>
+    <div className="metric-value">{selectedAircraft.current_tach || 0}</div>
+  </div>
 
-      <div>
-        <div className="metric-label">Airframe Total Time</div>
-        <div className="metric-value">{selectedAircraft.total_time || 0}</div>
-      </div>
+  <div className="summary-tile">
+    <div className="metric-label">Airframe Total Time</div>
+    <div className="metric-value">{selectedAircraft.total_time || 0}</div>
+  </div>
 
-      <div>
-        <div className="metric-label">Open Discrepancies</div>
-        <div className="metric-value">{discrepancies.length}</div>
-      </div>
+  <div className="summary-tile">
+    <div className="metric-label">Open Discrepancies</div>
+    <div className="metric-value">{discrepancies.length}</div>
+  </div>
 
-      <div>
-        <div className="metric-label">Open Maintenance Items</div>
-        <div className="metric-value">{maintenanceEvents.length}</div>
-      </div>
+  <div className="summary-tile">
+    <div className="metric-label">Open Maintenance</div>
+    <div className="metric-value">{maintenanceEvents.length}</div>
+  </div>
+
+  <div className="summary-tile red">
+    <div className="metric-label">Overdue Items</div>
+    <div className="metric-value">
+      {maintenanceEvents.filter((item) => getMaintenanceStatus(item).color === "red").length}
     </div>
+  </div>
+
+  <div className="summary-tile yellow">
+    <div className="metric-label">Upcoming Items</div>
+    <div className="metric-value">
+      {maintenanceEvents.filter((item) => getMaintenanceStatus(item).color === "yellow").length}
+    </div>
+  </div>
+</div>
   </section>
 )} 
               
