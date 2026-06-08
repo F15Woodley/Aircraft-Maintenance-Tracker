@@ -258,6 +258,21 @@ function openFlightDetails(flight) {
 
   return "green";
 }
+
+  function calculateDueTach(lastCompletedTach, intervalHours) {
+  if (!lastCompletedTach || !intervalHours) return "";
+
+  return Number(lastCompletedTach) + Number(intervalHours);
+}
+
+function calculateDueDate(lastCompletedDate, intervalMonths) {
+  if (!lastCompletedDate || !intervalMonths) return "";
+
+  const d = new Date(lastCompletedDate);
+  d.setMonth(d.getMonth() + Number(intervalMonths));
+
+  return d.toISOString().slice(0, 10);
+}
   
   async function loadAircraft(companyId) {
     const { data, error } = await supabase
@@ -545,6 +560,8 @@ const { error } = await supabase.from("aircraft_discrepancies").insert({
 
     loadDiscrepancies(selectedAircraft.id);
   }
+
+  
 
   async function addMaintenanceEvent() {
     if (!selectedAircraft || !company) return;
@@ -1778,12 +1795,15 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
               className="input"
               type="date"
               value={maintenanceForm.last_completed_date}
-              onChange={(e) =>
-                setMaintenanceForm({
-                  ...maintenanceForm,
-                  last_completed_date: e.target.value,
-                })
-              }
+onChange={(e) => {
+  const lastDate = e.target.value;
+
+  setMaintenanceForm({
+    ...maintenanceForm,
+    last_completed_date: lastDate,
+    due_date: calculateDueDate(lastDate, maintenanceForm.interval_months),
+  });
+}}
             />
           </div>
 
@@ -1808,18 +1828,18 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
               className="input"
               placeholder="e.g. 50"
               value={maintenanceForm.interval_hours}
-            onChange={(e) => {
-              const hours = e.target.value;
-            
-              setMaintenanceForm({
-                ...maintenanceForm,
-                interval_hours: hours,
-                due_tach:
-                  maintenanceForm.last_completed_tach && hours
-                    ? Number(maintenanceForm.last_completed_tach) + Number(hours)
-                    : "",
-              });
-            }}
+onChange={(e) => {
+  const intervalHours = e.target.value;
+
+  setMaintenanceForm({
+    ...maintenanceForm,
+    interval_hours: intervalHours,
+    due_tach: calculateDueTach(
+      maintenanceForm.last_completed_tach,
+      intervalHours
+    ),
+  });
+}}
             />
           </div>
 
@@ -1829,23 +1849,18 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
               className="input"
               placeholder="e.g. 12"
               value={maintenanceForm.interval_months}
-          onChange={(e) => {
-            const months = e.target.value;
-          
-            let calculatedDate = "";
-          
-            if (maintenanceForm.last_completed_date && months) {
-              const d = new Date(maintenanceForm.last_completed_date);
-              d.setMonth(d.getMonth() + Number(months));
-              calculatedDate = d.toISOString().slice(0, 10);
-            }
-          
-            setMaintenanceForm({
-              ...maintenanceForm,
-              interval_months: months,
-              due_date: calculatedDate,
-            });
-          }}
+        onChange={(e) => {
+          const intervalMonths = e.target.value;
+        
+          setMaintenanceForm({
+            ...maintenanceForm,
+            interval_months: intervalMonths,
+            due_date: calculateDueDate(
+              maintenanceForm.last_completed_date,
+              intervalMonths
+            ),
+          });
+        }}
             />
           </div>
 
