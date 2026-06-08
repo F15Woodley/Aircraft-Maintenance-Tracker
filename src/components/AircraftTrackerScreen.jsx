@@ -26,6 +26,8 @@ export default function AircraftTrackerScreen() {
   const [addFlightDiscrepancy, setAddFlightDiscrepancy] = useState(false);
   const [aircraftToDelete, setAircraftToDelete] = useState("");
   const [fleetStatusMap, setFleetStatusMap] = useState({});
+  const [activeView, setActiveView] = useState("fleet");
+  const [selectedMaintenanceAircraft, setSelectedMaintenanceAircraft] = useState(null);
 
   const [flightDiscrepancyForm, setFlightDiscrepancyForm] = useState({
     title: "",
@@ -1032,6 +1034,8 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
 <button
   className="nav-button"
   onClick={() => {
+    setActiveView("fleet");
+
     setSelectedAircraft(null);
     setDiscrepancies([]);
     setMaintenanceEvents([]);
@@ -1040,7 +1044,19 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
 >
   Fleet Ops
 </button>
-        <button className="nav-button">Maintenance</button>
+<button
+  className="nav-button"
+  onClick={() => {
+    setActiveView("maintenance");
+
+    setSelectedAircraft(null);
+    setDiscrepancies([]);
+    setMaintenanceEvents([]);
+    setDocuments([]);
+  }}
+>
+  Maintenance
+</button>
         <button className="nav-button" onClick={signOut}>
           Sign Out
         </button>
@@ -1069,6 +1085,9 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
                   <div className="stat-label">Currently Active</div>
                 </div>
                 </section>
+
+        {activeView === "fleet" && (
+  <>      
       <section className="fleet-section">
   <h2 className="section-title">Fleet</h2>
   <p className="section-text">
@@ -1202,13 +1221,6 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
       ))}
     </select>
 
-            <button
-          className="small-button edit-button"
-          onClick={() => startEditAircraft(plane)}
-        >
-          Edit
-        </button>
-
     <button className="danger-button" onClick={deleteAircraft}>
       Delete Aircraft
     </button>
@@ -1216,6 +1228,8 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
 </div>
   
 </section>
+      </>
+)}
             </>
           ) : (
             <>
