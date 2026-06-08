@@ -1806,12 +1806,18 @@ if (updatedTach !== null) {
               className="input"
               placeholder="e.g. 50"
               value={maintenanceForm.interval_hours}
-              onChange={(e) =>
-                setMaintenanceForm({
-                  ...maintenanceForm,
-                  interval_hours: e.target.value,
-                })
-              }
+            onChange={(e) => {
+              const hours = e.target.value;
+            
+              setMaintenanceForm({
+                ...maintenanceForm,
+                interval_hours: hours,
+                due_tach:
+                  maintenanceForm.last_completed_tach && hours
+                    ? Number(maintenanceForm.last_completed_tach) + Number(hours)
+                    : "",
+              });
+            }}
             />
           </div>
 
@@ -1821,12 +1827,23 @@ if (updatedTach !== null) {
               className="input"
               placeholder="e.g. 12"
               value={maintenanceForm.interval_months}
-              onChange={(e) =>
-                setMaintenanceForm({
-                  ...maintenanceForm,
-                  interval_months: e.target.value,
-                })
-              }
+          onChange={(e) => {
+            const months = e.target.value;
+          
+            let calculatedDate = "";
+          
+            if (maintenanceForm.last_completed_date && months) {
+              const d = new Date(maintenanceForm.last_completed_date);
+              d.setMonth(d.getMonth() + Number(months));
+              calculatedDate = d.toISOString().slice(0, 10);
+            }
+          
+            setMaintenanceForm({
+              ...maintenanceForm,
+              interval_months: months,
+              due_date: calculatedDate,
+            });
+          }}
             />
           </div>
 
