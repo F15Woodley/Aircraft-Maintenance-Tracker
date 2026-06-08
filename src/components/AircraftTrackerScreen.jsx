@@ -896,19 +896,20 @@ async function saveFlightLog() {
     }
   }
 
-const updatedTach =
-  tachIn !== null
-    ? tachIn
-    : hobbsIn !== null
-    ? hobbsIn
-    : null;
+const updatedTach = tachIn !== null ? tachIn : null;
 
-if (updatedTach !== null) {
+const updatedTotalTime =
+  calculatedFlightTime !== null
+    ? Number(selectedAircraft.total_time || 0) + Number(calculatedFlightTime)
+    : selectedAircraft.total_time;
+
+if (updatedTach !== null || calculatedFlightTime !== null) {
   const { error: aircraftUpdateError } = await supabase
     .from("aircraft")
     .update({
-      current_tach: updatedTach,
-      total_time: updatedTach,
+      current_tach:
+        updatedTach !== null ? updatedTach : selectedAircraft.current_tach,
+      total_time: updatedTotalTime,
     })
     .eq("id", selectedAircraft.id);
 
@@ -920,8 +921,9 @@ if (updatedTach !== null) {
 
   setSelectedAircraft({
     ...selectedAircraft,
-    current_tach: updatedTach,
-    total_time: updatedTach,
+    current_tach:
+      updatedTach !== null ? updatedTach : selectedAircraft.current_tach,
+    total_time: updatedTotalTime,
   });
 
   loadAircraft(company.id);
