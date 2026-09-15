@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
+import MaintenanceOnboarding from "./MaintenanceOnboarding";
 import "../App.css";
 
 export default function AircraftTrackerScreen() {
@@ -1312,6 +1313,12 @@ onClick={() => {
     <p className="section-text">
       Airframe, engine, propeller, inspection, discrepancy, and compliance tracking.
     </p>
+
+    {canManageMaintenance() && <MaintenanceOnboarding
+      aircraft={selectedAircraft}
+      company={company}
+      onApproved={() => loadMaintenanceEvents(selectedAircraft.id)}
+    />}
 
     <div className="collapsible-form">
       <h3>AD &amp; Maintenance Research</h3>
