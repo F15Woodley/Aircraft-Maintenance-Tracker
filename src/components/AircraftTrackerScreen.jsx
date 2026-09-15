@@ -1076,7 +1076,7 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
         </div>
 
         <main className="content">
-          {!selectedAircraft ? (
+          {!selectedAircraft || activeView === "maintenance-detail" ? (
             <>
               <section className="hero-grid">
                 <div className="card">
