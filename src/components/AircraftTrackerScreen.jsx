@@ -56,6 +56,7 @@ export default function AircraftTrackerScreen() {
     tail_number: "",
     make: "",
     model: "",
+    serial_number: "",
     current_tach: "",
     total_time: "",
     flightaware_url: "",
@@ -92,6 +93,7 @@ const [editAircraftForm, setEditAircraftForm] = useState({
   tail_number: "",
   make: "",
   model: "",
+  serial_number: "",
   current_tach: "",
   total_time: "",
   flightaware_url: "",
@@ -407,6 +409,7 @@ function openAircraftDashboard(plane) {
     tail_number: plane.tail_number || "",
     make: plane.make || "",
     model: plane.model || "",
+    serial_number: plane.serial_number || "",
     current_tach: plane.current_tach || "",
     total_time: plane.total_time || "",
     flightaware_url: plane.flightaware_url || "",
@@ -420,6 +423,7 @@ function cancelEditAircraft() {
     tail_number: "",
     make: "",
     model: "",
+    serial_number: "",
     current_tach: "",
     total_time: "",
     flightaware_url: "",
@@ -435,6 +439,7 @@ async function updateAircraft() {
       tail_number: editAircraftForm.tail_number.trim().toUpperCase(),
       make: editAircraftForm.make.trim(),
       model: editAircraftForm.model.trim(),
+      serial_number: editAircraftForm.serial_number.trim().toUpperCase(),
       current_tach: Number(editAircraftForm.current_tach || 0),
       total_time: Number(editAircraftForm.total_time || 0),
       flightaware_url: editAircraftForm.flightaware_url.trim(),
@@ -461,6 +466,7 @@ async function updateAircraft() {
       tail_number: form.tail_number.trim().toUpperCase(),
       make: form.make.trim(),
       model: form.model.trim(),
+      serial_number: form.serial_number.trim().toUpperCase(),
       current_tach: Number(form.current_tach || 0),
       total_time: Number(form.total_time || 0),
       flightaware_url: form.flightaware_url.trim(),
@@ -475,6 +481,7 @@ async function updateAircraft() {
       tail_number: "",
       make: "",
       model: "",
+      serial_number: "",
       current_tach: "",
       total_time: "",
       flightaware_url: "",
@@ -1171,6 +1178,7 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
         <input className="input" placeholder="Tail Number" value={form.tail_number} onChange={(e) => setForm({ ...form, tail_number: e.target.value })} />
         <input className="input" placeholder="Make" value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} />
         <input className="input" placeholder="Model" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
+        <input className="input" placeholder="Airframe Serial Number" value={form.serial_number} onChange={(e) => setForm({ ...form, serial_number: e.target.value })} />
         <input className="input" placeholder="Current Tach" value={form.current_tach} onChange={(e) => setForm({ ...form, current_tach: e.target.value })} />
         <input className="input" placeholder="Total Time" value={form.total_time} onChange={(e) => setForm({ ...form, total_time: e.target.value })} />
         <input className="input" placeholder="FlightAware URL" value={form.flightaware_url} onChange={(e) => setForm({ ...form, flightaware_url: e.target.value })} />
@@ -1190,6 +1198,7 @@ if (updatedTach !== null || calculatedFlightTime !== null) {
       <input className="input" placeholder="Tail Number" value={editAircraftForm.tail_number} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, tail_number: e.target.value })} />
       <input className="input" placeholder="Make" value={editAircraftForm.make} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, make: e.target.value })} />
       <input className="input" placeholder="Model" value={editAircraftForm.model} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, model: e.target.value })} />
+      <input className="input" placeholder="Airframe Serial Number" value={editAircraftForm.serial_number} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, serial_number: e.target.value })} />
       <input className="input" placeholder="Current Tach" value={editAircraftForm.current_tach} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, current_tach: e.target.value })} />
       <input className="input" placeholder="Total Time" value={editAircraftForm.total_time} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, total_time: e.target.value })} />
       <input className="input" placeholder="FlightAware URL" value={editAircraftForm.flightaware_url} onChange={(e) => setEditAircraftForm({ ...editAircraftForm, flightaware_url: e.target.value })} />
@@ -1303,6 +1312,25 @@ onClick={() => {
     <p className="section-text">
       Airframe, engine, propeller, inspection, discrepancy, and compliance tracking.
     </p>
+
+    <div className="collapsible-form">
+      <h3>AD &amp; Maintenance Research</h3>
+      <p className="section-text">
+        {selectedAircraft.make} {selectedAircraft.model} — airframe serial
+        {selectedAircraft.serial_number ? ` ${selectedAircraft.serial_number}` : " not entered"}.
+        Search FAA records for the airframe and each installed engine, propeller,
+        and appliance. Compare model and serial-number applicability before adding
+        a recurring requirement to the schedule.
+      </p>
+      <a className="secondary-button" href="https://drs.faa.gov/" target="_blank" rel="noopener noreferrer">
+        Open FAA AD Search ↗
+      </a>
+      <p className="section-text">
+        Oil changes, overhaul recommendations, ICA/STC tasks, and inspection
+        intervals require the current manuals and actual installed configuration.
+        Candidate findings are not an airworthiness or AD-compliance determination.
+      </p>
+    </div>
 
 <div className="maintenance-summary-grid">
   <div className="summary-tile">
